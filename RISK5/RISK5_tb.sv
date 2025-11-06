@@ -1,7 +1,7 @@
 `timescale 1ns/1ns
 `include "top.sv"
 
-module mini3_tb;
+module RISK5_tb;
 
     logic clk;
     logic rst_n;  
@@ -64,8 +64,8 @@ module mini3_tb;
     end
 
     initial begin
-        $dumpfile("mini3.vcd");
-        $dumpvars(0, mini3_tb);
+        $dumpfile("RISK5.vcd");
+        $dumpvars(0, RISK5_tb);
         #800000000
         $finish;
     end
