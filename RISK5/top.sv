@@ -1,96 +1,80 @@
-`include "values.sv" 
-`include "ws2812b.sv" // drives the ws2812b led strip
-`include "controller.sv" // finite state machine to control the data flow
+`include "memory.sv" 
+`include "program_counter.sv" 
+`include "register_file.sv" 
+`include "alu.sv"
 
-// led_matrix top level module
 
 module top(
     input logic     clk, 
-    input logic     SW, 
-    input logic     BOOT, 
-    output logic    _48b, 
-    output logic    _45a
+    output logic    RGB_R, 
+    output logic    RGB_G,
+    output logic    RGB_B,
+    output logic    LED
 );
-    // three data buses
-    logic [7:0] read_data;
 
-    logic [5:0] pixel;
-    logic newframe; 
+    parameter RTYPECODE = 7'b0110011;
 
-    // green red blue
-    logic [23:0] shift_reg = 24'd0; // going to put pixe
-    logic load_sreg;
-    logic transmit_pixel;
-    logic shift; 
-    logic ws2812b_out;
+    logic[31:0] current_instr;
+    logic[6:0] op_code;
+    logic[2:0] funct3;
+    logic[6:0] funct7;
+    logic[5:0] rs1;
+    logic[5:0] rs2;
+    logic[5:0] rd;
+    logic[11:0] immed12;
+    logic[19:0] immed20;
 
+    logic load_new; // Signal to load a new instruction 
 
-
-    // my stuff
-
-    logic [63:0] pixel_control = 64'b0;
-    logic [63:0] next_pixel_control; // next state of the array 
-
-    logic [5:0] pixel_index = 3'b0; // pixel index to light up
-
-    logic [1:0] flipper = 2'b00; // controls which color is being loaded
-    
-    
-    
-
-    // Instance sample memory for red channel
-    values u1 (
+    memory#(
+        .INIT_FILE      ("") // Assign at some point
+    ) u1(
         .clk         (clk), 
-        .rst_n       (SW), // <-- FIX: Connect the reset port!
-        .newframe    (newframe), 
-        .pixel        (pixel),
-        .read_data     (read_data)
+        .write_mem       (write_mem),
+        .funct3          (funct3), 
+        .write_address   (write_address), 
+        .write_data      (write_data), 
+        .read_address    (read_address),
+        .read_data       (read_data),
+        .led             (led),     
+        .red             (red),            
+        .green           (green),          
+        .blue            (blue)
     );
 
-    // Instance the WS2812B output driver
-    ws2812b u4 ( // this is the controller 
+    program_counter u2 (  
         .clk            (clk), 
-        .serial_in      (shift_reg[23]), // produces for one ck period
-        .transmit       (transmit_pixel), // goes high for 15 * 24 clk cycles cause that timing workes so it does not lock
-        .ws2812b_out    (ws2812b_out), //
-        .shift          (shift)
+        .pc_sel         (pc_sel),
+        .result         (result),
+        .pc             (pc)
     );
 
-    // Instance the controller
-    controller u5 (
+    register_file u3 (
         .clk            (clk), 
-        .load_sreg      (load_sreg), 
-        .transmit_pixel (transmit_pixel),// goes high for 15 * 24 clk cycles cause that timing workes so it does not lock 
-        .pixel          (pixel), // pixel address
-        .newframe          (newframe) // fram address
+    );
+
+    alu u4 (
+        .clk            (clk), 
+        .rs1_data       (rs1_data),
+        .rs2_data       (rs2_data),
+        .immed12        (immed12),
+        .pc             (pc), // for jump/branch
+        .funct3         (funct3),
+        .funct7         (funct7),
+        .result         (result)
     );
 
     always_ff @(posedge clk) begin
-        if(newframe) begin
-            flipper = flipper + 1;
-            if (flipper == 2'b11) begin
-                flipper = 2'b00;
+        if (load_new == 1) begin
+            op_code = current_instr[25:31]
+            funct3 = current_instr[17:19]
+            if (op_code == RTYPECODE) begin
+                funct7 = current_instr[0:6]
+                rs2 = current_instr[7:11]
+                rs1 = current_instr[12:16]
+                rd = current_instr[20:24] // R-type instructions ???
             end
         end
-        if (load_sreg) begin // if shift reg is high
-            unique case (flipper)
-                2'b00:
-                    shift_reg <= { read_data, 16'd0 };
-                2'b01:
-                    shift_reg <= { 8'd0, read_data, 8'd0 };
-                2'b10:
-                    shift_reg <= { 16'd0, read_data };
-                2'b11: // this is the default case
-                    shift_reg <= { 16'd0, read_data };
-            endcase
-        end
-        else if (shift) begin
-            shift_reg <= { shift_reg[22:0], 1'b0 }; 
-        end
     end
-
-
-    assign _48b = ws2812b_out; // output
-    assign _45a = ~ws2812b_out; // complementary output
 
 endmodule
