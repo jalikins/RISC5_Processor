@@ -2,6 +2,7 @@
 `include "program_counter.sv" 
 `include "register_file.sv" 
 `include "alu.sv"
+`include "instr_decoder.sv"
 
 
 module top(
@@ -11,9 +12,6 @@ module top(
     output logic    RGB_B,
     output logic    LED
 );
-
-    parameter RTYPECODE = 7'b0110011;
-
     logic[31:0] current_instr;
     logic[6:0] op_code;
     logic[2:0] funct3;
@@ -28,7 +26,7 @@ module top(
 
     memory#(
         .INIT_FILE      ("") // Assign at some point
-    ) u1(
+    ) u1 (
         .clk         (clk), 
         .write_mem       (write_mem),
         .funct3          (funct3), 
@@ -51,6 +49,14 @@ module top(
 
     register_file u3 (
         .clk            (clk), 
+        .rst            (rst),
+        .rw             (rw),
+        .rs1            (rs1),
+        .rs2            (rs2),
+        .rd             (rd),
+        .wd             (wd),
+        .rd1            (rd1),
+        .rd2            (rd2)
     );
 
     alu u4 (
@@ -64,16 +70,26 @@ module top(
         .result         (result)
     );
 
+    instr_decoder u5 (
+        .clk            (clk), 
+        .current_instr  (current_instr),
+        .immed20        (immed20),
+        .immed12        (immed12),
+        .op_code        (op_code),
+        .funct7         (funct7),
+        .funct3         (funct3),
+        .rs1            (rs1),
+        .rs2            (rs2),
+        .rd             (rd)
+    );
+
+
     always_ff @(posedge clk) begin
         if (load_new == 1) begin
-            op_code = current_instr[25:31]
-            funct3 = current_instr[17:19]
-            if (op_code == RTYPECODE) begin
-                funct7 = current_instr[0:6]
-                rs2 = current_instr[7:11]
-                rs1 = current_instr[12:16]
-                rd = current_instr[20:24] // R-type instructions ???
-            end
+            // get a new current_instr
+            // feed inputs into ALU
+            // update register file
+            // update pc
         end
     end
 

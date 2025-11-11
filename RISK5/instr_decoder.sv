@@ -1,16 +1,19 @@
 module instr_decoder (
-    input [31:0] current_instr,
-    output [11:0] immed12,
-    output [6:0] op_code,
-    output [6:0] funct7,
-    output [2:0] funct3,
-    output [2:0] rs2,
-    output [2:0] rs1,
-    output [2:0] rd,
+    input logic[31:0] current_instr,
+    input logic clk,
+    output logic[19:0] immed20
+    output logic[11:0] immed12,
+    output logic[6:0] op_code,
+    output logic[6:0] funct7,
+    output logic[2:0] funct3,
+    output logic[2:0] rs2,
+    output logic[2:0] rs1,
+    output logic[2:0] rd
 );
     parameter RTYPECODE = 7'b0110011;
     parameter ITYPECODE = 7'b0010011;
     parameter BTYPECODE = 7'b1100011;
+    parameter UTYPECODE = 7'b0110111;
 
     always_comb begin
         op_code = current_instr[25:31]
@@ -28,6 +31,9 @@ module instr_decoder (
             immed12 = {current_instr[0], current_instr[24], current_instr[1:6], current_instr[20:23]}
             rs2 = current_instr[7:11]
             rs1 = current_instr[12:16]
+        end else if (op_code == UTYPECODE) begin
+            immed20 = current_instr[0:19]
+            rd = current_instr[20:24]
         end
     end
 endmodule
