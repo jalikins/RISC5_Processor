@@ -1,6 +1,6 @@
 module controller (
     input logic clk,
-    input logic[6:0] opcode,
+    input logic[6:0] op_code,
     input logic fun7,
     input logic[2:0] funct3,
     output logic[3:0] ALU_control_signal,
@@ -16,11 +16,17 @@ module controller (
 );
 // not done brah
 
-    typedef enum logic [1:0] {
-        FETCH  = 2'b00,
-        DECODE   = 2'b01,
-        INSTR_RUN = 2'b10,
+    typedef enum logic [2:0] { // set up fsm--will need to expand by instruction
+        FETCH  = 3'b000,
+        DECODE   = 3'b001,
+        INSTR_RUN = 3'b010,
+        MEMADR = 3'b011,
+        MEMREAD = 3'b100,
+        MEMWB = 3'b101
     } state_t;
+
+    parameter LW_CODE = 7'b0000011;
+    parameter ADDSUB_CODE = 7'b0110011;
 
     state_t state, next_state;
 
@@ -32,7 +38,7 @@ module controller (
     end
 
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
-        next_state = state;
+        state <= next_state
 
         case (state)
 
@@ -40,15 +46,19 @@ module controller (
                 next_state = DECODE; // write pc to old_pc
                 AdrSrc => 0; // fetch adress from pc
                 IRWrite => 1; // writes to instruction reg
+                // we should be updating current instr right here
             end
 
             DECODE: begin
-                next_state = ; // no control signals needed
-            end
+                next_state = INSTR_RUN; // no control signals needed
+                //update the current instruction, 
+                case (op_code)
+                endcase
+            end 
 
             INSTR_RUN: begin
                 finished = 1'b1;
-                if (ack)
+                if (reset)
                     next_state = IDLE;
             end
 
