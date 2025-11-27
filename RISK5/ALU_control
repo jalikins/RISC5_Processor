@@ -1,4 +1,4 @@
-module ALU_control (
+module ALU_control ( // ALL IMPLEMENTED IN CONTROLLER
     input  [3:0] ALUOp,
     input fun7,
     input  [2:0] fun3,

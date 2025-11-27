@@ -85,7 +85,7 @@ module top(
 
 
     always_ff @(posedge clk) begin
-        if (load_new == 1) begin
+        if (IRWrite == 1) begin
             // get a new current_instr
             // feed inputs into ALU
             // update register file
