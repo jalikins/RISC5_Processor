@@ -3,7 +3,7 @@ module controller (
     input logic[6:0] op_code,
     input logic fun7,
     input logic[2:0] funct3,
-    output logic[3:0] ALU_control_signal,
+    output logic[2:0] ALU_control,
     output logic[1:0] ALUSrcA,
     output logic[1:0] ALUSrcB,
     output logic[1:0] ImmSrc,
@@ -16,17 +16,37 @@ module controller (
 );
 // not done brah
 
-    typedef enum logic [2:0] { // set up fsm--will need to expand by instruction
-        FETCH  = 3'b000,
-        DECODE   = 3'b001,
-        INSTR_RUN = 3'b010,
-        MEMADR = 3'b011,
-        MEMREAD = 3'b100,
-        MEMWB = 3'b101
-    } state_t;
+    // R-type
+    parameter RTYPE_CODE = 7'b0110011;
+    // Upper-immediate
+    parameter LUI_CODE = 7'b0110111;
+    parameter AUIPC_CODE = 7'b0010111;
+    // Jump
+    parameter JAL_CODE = 7'b1101111;
+    // Jalr (actually i type)
+    parameter JALR_CODE = 7'b1100111;
+    // Branch
+    parameter BRANCH_CODE = 7'b1100011;
+    // I-type
+    parameter LOAD_CODE = 7'b0000011;
+    parameter LOGICI_CODE = 7'b0010011;
+    // S-type
+    parameter STORE_CODE = 7'b0100011;
 
-    parameter LW_CODE = 7'b0000011;
-    parameter ADDSUB_CODE = 7'b0110011;
+    logic PCUpdate = 0;
+    logic branch = 0;
+
+
+    typedef enum logic [3:0] { // set up fsm--will need to expand by instruction
+        FETCH  = 4'b0000,
+        DECODE   = 4'b0001,
+        MEMADR = 4'b0010,
+        MEMREAD = 4'b0011,
+        MEMWB = 4'b0100,
+        MEMWRITE = 4'b0101, // they use memwrite twice in two different ways, all caps is for fsm
+        EXECUTER = 4'b0111,
+        ALUWB = 4'b1000
+    } state_t;
 
     state_t state, next_state;
 
@@ -38,23 +58,95 @@ module controller (
     end
 
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
-        state <= next_state
-
+        state <= next_state;
+        PCWrite = (branch & 0) | PCUpdate; // not sure what is going on with the and with 0
         case (state)
 
             FETCH: begin
                 next_state = DECODE; // write pc to old_pc
-                AdrSrc => 0; // fetch adress from pc
-                IRWrite => 1; // writes to instruction reg
+                AdrSrc <= 0; // fetch adress from pc
+                IRWrite <= 1; // writes to instruction reg
+                ALUSrcA = 2'b00; // updating the pc --> choose pc as src 1 for alu
+                ALUSrcB = 2'b10; // alu src b is the constant 4
+                ALU_control = 3'b000; // alu control is 0 --> add
+                PCUpdate = 1'b1;
                 // we should be updating current instr right here
             end
 
             DECODE: begin
-                next_state = INSTR_RUN; // no control signals needed
-                //update the current instruction, 
+                //update the current instruction, no control signals here
                 case (op_code)
+                    LOAD_CODE: begin
+                        next_state = MEMADR; // if we are in a lb/lh/lw instr we go to MEM_ADR
+                    end
+                    STORE_CODE: begin
+                        next_state = MEMADR;
+                    end
+                    RTYPE_CODE: begin
+                        next_state = EXECUTER; // state for R-type instructions
+                    end
                 endcase
             end 
+
+            MEMADR: begin // get memory adress to read from
+                ALUSrcA <= 2'b10; // Set ALU signals rs1 and immed12
+                ALUSrcB <= 2'b01;
+                ALU_control <= 3'b000; // ALU set to add mode
+                case (op_code)
+                    LOAD_CODE: begin
+                        next_state = MEMREAD // if we are in a lb/lh/lw instr we go to MEMREAD
+                    end
+                    STORE_CODE: begin
+                        next_state = MEMWRITE // if we are saving a w/h/b we go to mem write
+                    end
+                endcase
+            end
+
+            MEMREAD: begin // send ALU_out as input to mem adress port to read from that adress
+                ResultSrc <= 2'b0; // routes ALUout through result mux
+                AdrSrc <= 1'b0; // routes ALUout through data adress
+                // data is read from ALUout adress
+                // data is stored in data register
+                case (op_code)
+                    LOAD_CODE: begin
+                        next_state = MEMWB // if we are in a lb/lh/lw instr we go to MEM_ADR
+                    end
+                endcase
+            end
+
+            MEMWB: begin // Writes the loaded word stored in data reg to the reg file
+                next_state = FETCH;
+                ResultSrc <= 2'b01; // Selects the data as the result
+                RegWrite <= 1'b1; // Writing data to the register file
+            end
+
+            MEMWRITE: begin
+                next_state = FETCH;
+                ResultSrc <= 2'b00;
+                AdrSrc <= 1'b1;
+                memwrite <= 1'b1;
+            end
+
+            EXECUTER: begin
+                ALUSrcA <= 2'b10; // rs1
+                ALUSrcB <= 2'b00; // rs2
+                case(fun7, funct3)
+                    1'b0, 3'b000: ALU_control = 3'b010; // ADD
+                    1'b1, 3'b000: ALU_control = 3'b110; // SUB
+                    1'b0, 3'b111: ALU_control = 3'b000; // AND
+                    1'b0, 3'b110: ALU_control = 3'b001; // OR
+                    1'b0, 3'b100: ALU_control = 3'b011; // XOR
+                    1'b0, 3'b001: ALU_control = 3'b100; // SLL
+                    1'b0, 3'b101: ALU_control = 3'b101; // SRL
+                    1'b1, 3'b101: ALU_control = 3'b111; // SRA
+                endcase
+            end
+
+            ALUWB: begin
+                next_state = FETCH;
+                ResultSrc = 2'b00; // result from ALU
+                RegWrite = 1'b1; // writes result to register
+            end
 
             INSTR_RUN: begin
                 finished = 1'b1;
@@ -68,14 +160,14 @@ module controller (
     always @(*) begin
         case (ALUOp, fun7, fun3)
             // R-type instructions
-            4'b0010, 1'b0, 3'b000: ALU_control_signal = 4'b0010; // ADD
-            4'b0010, 1'b1, 3'b000: ALU_control_signal = 4'b0110; // SUB
-            4'b0010, 1'b0, 3'b111: ALU_control_signal = 4'b0000; // AND
-            4'b0010, 1'b0, 3'b110: ALU_control_signal = 4'b0001; // OR
-            4'b0010, 1'b0, 3'b100: ALU_control_signal = 4'b0011; // XOR
-            4'b0010, 1'b0, 3'b001: ALU_control_signal = 4'b0100; // SLL
-            4'b0010, 1'b0, 3'b101: ALU_control_signal = 4'b0101; // SRL
-            4'b0010, 1'b1, 3'b101: ALU_control_signal = 4'b0111; // SRA
+            4'b0010, 1'b0, 3'b000: ALU_control = 4'b0010; // ADD
+            4'b0010, 1'b1, 3'b000: ALU_control = 4'b0110; // SUB
+            4'b0010, 1'b0, 3'b111: ALU_control = 4'b0000; // AND
+            4'b0010, 1'b0, 3'b110: ALU_control = 4'b0001; // OR
+            4'b0010, 1'b0, 3'b100: ALU_control = 4'b0011; // XOR
+            4'b0010, 1'b0, 3'b001: ALU_control = 4'b0100; // SLL
+            4'b0010, 1'b0, 3'b101: ALU_control = 4'b0101; // SRL
+            4'b0010, 1'b1, 3'b101: ALU_control = 4'b0111; // SRA
 
             // I-type instructions
             4'b0000, _, 3'b000: ALU_control_signal = 4'b0010; // ADDI
