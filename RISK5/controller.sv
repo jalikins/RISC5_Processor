@@ -36,8 +36,8 @@ module controller (
     // S-type
     parameter STORE_CODE = 7'b0100011;
 
-    logic PCUpdate = 0;
-    logic branch = 0;
+    logic PCUpdate = 1'b0;
+    logic branch = 1'b0;
 
 
     typedef enum logic [3:0] { // set up fsm--will need to expand by instruction
@@ -227,7 +227,7 @@ module controller (
 
             LUI: begin
                 next_state = ALUWB;
-                RegWrite = 1'b1;
+                RegWrite <= 1'b1;
                 ResultSrc <= 2'b11; // Should be immediate generator
             end
 
