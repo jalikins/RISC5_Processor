@@ -52,7 +52,9 @@ module controller (
         BRANCH = 4'b1001,
         EXECUTEI = 4'b1010,
         JAL = 4'b1011,
-        JALR = 4'b1100
+        JALR = 4'b1100,
+        LUI = 4'b1101,
+        AUIPC = 4'b1110
     } state_t;
 
     state_t state, next_state;
@@ -123,15 +125,11 @@ module controller (
             end
 
             MEMREAD: begin // send ALU_out as input to mem adress port to read from that adress
+                next_state = MEMWB // if we are in a lb/lh/lw instr we go to MEM_ADR
                 ResultSrc <= 2'b0; // routes ALUout through result mux
                 AdrSrc <= 1'b0; // routes ALUout through data adress
                 // data is read from ALUout adress
                 // data is stored in data register
-                case (op_code)
-                    LOAD_CODE: begin
-                        next_state = MEMWB // if we are in a lb/lh/lw instr we go to MEM_ADR
-                    end
-                endcase
             end
 
             MEMWB: begin // Writes the loaded word stored in data reg to the reg file
@@ -167,63 +165,78 @@ module controller (
 
             ALUWB: begin
                 next_state = FETCH;
-                ResultSrc = 2'b00; // result from ALU
-                default: RegWrite = 1'b1; //writes to rd
+                ResultSrc <= 2'b00; // result from ALU
+                default: RegWrite <= 1'b1; //writes to rd
             end
 
             BRANCH: begin
-                ALUSrcA = 2'b10; // rs1
-                ALUSrcB = 2'b00; // rs2
-                ResultSrc = 2'b00;
-                ALU_control = 4'b0110; // Subtract (according to textbook)
+                next_state <= FETCH;
+                ALUSrcA <= 2'b10; // rs1
+                ALUSrcB <= 2'b00; // rs2
+                ResultSrc <= 2'b00;
+                ALU_control <= 4'b0110; // Subtract (according to textbook)
                 case(funct3)
-                    3'b110: ALU_control = 4'b1101; // Sub unsigned -- how do we do this again??
-                    3'b111: ALU_control = 4'b1101; // Sub unsigned
-                    default: ALU_control = 3'b001;
+                    3'b110: ALU_control <= 4'b1101; // Sub unsigned -- how do we do this again??
+                    3'b111: ALU_control <= 4'b1101; // Sub unsigned
+                    default: ALU_control <= 4'b0110;
                 endcase
                 case(funct3, sign, zero)
-                    3'b000, 1'b1, 1'b1: PCUpdate = 1'b1; // if ALU returns 0, we branch
-                    3'b001, 1'b1, 1'b0: PCUpdate = 1'b1; // if ALU doesn't return 0, we branch
-                    3'b001, 1'b0, 1'b0: PCUpdate = 1'b1; // if ALU doesn't return 0, we branch
-                    3'b100, 1'b0, 1'b0: PCUpdate = 1'b1; // blt - only branch if sign is negative
-                    3'b101, 1'b1, 1'b0: PCUpdate = 1'b1; // bge - only branch if sign is positive
-                    default: PCUpdate = 1'b0;
+                    3'b000, 1'b1, 1'b1: PCUpdate <= 1'b1; // if ALU returns 0, we branch
+                    3'b001, 1'b1, 1'b0: PCUpdate <= 1'b1; // if ALU doesn't return 0, we branch
+                    3'b001, 1'b0, 1'b0: PCUpdate <= 1'b1; // if ALU doesn't return 0, we branch
+                    3'b100, 1'b0, 1'b0: PCUpdate <= 1'b1; // blt - only branch if sign is negative
+                    3'b101, 1'b1, 1'b0: PCUpdate <= 1'b1; // bge - only branch if sign is positive
+                    default: PCUpdate <= 1'b0;
                 endcase
             end
 
             EXECUTEI: begin
                 next_state = ALUWB;
-                ALUSrcA = 2'b10;
-                ALUSrcB = 2'b01;
-                case(funct3)
-                    3'b000: ALU_control = 4'b0000; // ADD !!! In textbook add is 000
-                    3'b111: ALU_control = 4'b0001; // AND
-                    3'b110: ALU_control = 4'b0010; // OR
-                    3'b100: ALU_control = 4'b0011; // XOR
-                    3'b001: ALU_control = 4'b0100; // SLL
-                    3'b101: ALU_control = 4'b0101; // SRL
-                    3'b101: ALU_control = 4'b0111; // SRA --THIS ONE HAS A FUNCT 7 SO WE NEED TO IMPORT THAT SOMEHOW.
-                    3'b010: ALU_control = 4'b1010; // SLT
-                    3'b011: ALU_control = 4'b1001; // SLTU
+                ALUSrcA <= 2'b10;
+                ALUSrcB <= 2'b01;
+                case(fun7, funct3)
+                    1'b0, 3'b000: ALU_control <= 4'b0000; // ADD !!! In textbook add is 000
+                    1'b0, 3'b111: ALU_control <= 4'b0001; // AND
+                    1'b0, 3'b110: ALU_control <= 4'b0010; // OR
+                    1'b0, 3'b100: ALU_control <= 4'b0011; // XOR
+                    1'b0, 3'b001: ALU_control <= 4'b0100; // SLL
+                    1'b0, 3'b101: ALU_control <= 4'b0101; // SRL __ 
+                    1'b1, 3'b101: ALU_control <= 4'b0111; // SRA __ need a case statement in decoder to give a fun7 for these if funct3 is 101
+                    1'b0, 3'b010: ALU_control <= 4'b1010; // SLT
+                    1'b0, 3'b011: ALU_control <= 4'b1001; // SLTU
                 endcase
             end
 
             JAL: begin
                 next_state = ALUWB;
-                ALUSrcA = 2'b01;
-                ALUSrcB = 2'b10;
-                ALU_control = 4'b0000; // ADD - we need to normalize these
-                ResultSrc = 2'b00;
-                PCUpdate = 1'b1;
+                ALUSrcA <= 2'b01; // OLD PC
+                ALUSrcB <= 2'b10; // 4
+                ALU_control <= 4'b0000; // ADD - we need to normalize these
+                ResultSrc <= 2'b00;
+                PCUpdate <= 1'b1;
             end
 
             JALR: begin
                 next_state = ALUWB;
-                ALUSrcA = 2'b10; // Rrs1
-                ALUSrcB = 2'b01; // Signed offset
-                ALU_control = 4'b0000;
-                ResultSrc = 2'b00;
-                PCWrite = 1'b1; // updates the pc with the new adress
+                ALUSrcA <= 2'b10; // Rrs1
+                ALUSrcB <= 2'b01; // Signed offset
+                ALU_control <= 4'b0000;
+                ResultSrc <= 2'b00;
+                PCWrite <= 1'b1; // updates the pc with the new adress
+            end
+
+            LUI: begin
+                next_state = ALUWB;
+                RegWrite = 1'b1;
+                ResultSrc <= 2'b11; // Should be immediate generator
+            end
+
+            AUIPC: begin
+                next_state = ALUWB;
+                ALU_control = 4'b0000; // ADDING
+                ALUSrcA = 2'b01; // Old PC
+                ALUSrcB = 2'b01; // Imm gen
+                ResultSrc = 2'b00; // Writes the previous ALU out ie. old PC to reg
             end
 
         endcase
@@ -238,3 +251,7 @@ endmodule
 //          4'b0010, 1'b0, 3'b001: ALU_control = 4'b0100; // SLL
 //          4'b0010, 1'b0, 3'b101: ALU_control = 4'b0101; // SRL
 //          4'b0010, 1'b1, 3'b101: ALU_control = 4'b0111; // SRA
+//          4'b1001 // SET LESS THAN Unsinged
+//          4'b1010 // SET LESS THAN SIGNED
+//          4'b1100 // NOR
+//          4'b1101 // Subtract unsigned
