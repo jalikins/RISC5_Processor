@@ -85,7 +85,7 @@ module controller (
                 // always calculate the branch target as though the instruction were a branch
                 ALUSrcA = 2'b01; // Should be OldPC
                 ALUSrcB = 2'b01; // immedext
-                ALU_control = 3'b0000; // Addition
+                ALU_control = 4'b0000; // Addition
                 case (op_code)
                     LOAD_CODE: begin
                         next_state = MEMADR; // if we are in a lb/lh/lw instr we go to MEM_ADR
@@ -175,7 +175,7 @@ module controller (
                 ALUSrcA = 2'b10; // rs1
                 ALUSrcB = 2'b00; // rs2
                 ResultSrc = 2'b00;
-                ALU_control = 3'b001; // Subtract (according to textbook)
+                ALU_control = 4'b0110; // Subtract (according to textbook)
                 case(funct3)
                     3'b110: ALU_control = 4'b1101; // Sub unsigned -- how do we do this again??
                     3'b111: ALU_control = 4'b1101; // Sub unsigned
@@ -228,6 +228,7 @@ module controller (
 
         endcase
     end
+endmodule
 //
 //          4'b0010, 1'b0, 3'b000: ALU_control = 4'b0000; // ADD
 //          4'b0010, 1'b1, 3'b000: ALU_control = 4'b0110; // SUB

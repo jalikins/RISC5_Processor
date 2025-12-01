@@ -21,6 +21,7 @@ module ALU_unit(
             default: alu_result = 32'b0; // DEFAULT
         endcase
 
+        // zero flag
         zero = (alu_result == 32'b0) ? 1'b1 : 1'b0;
     end
 
