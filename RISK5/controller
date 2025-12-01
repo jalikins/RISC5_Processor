@@ -75,7 +75,7 @@ module controller (
                 IRWrite <= 1; // writes to instruction reg
                 ALUSrcA = 2'b00; // updating the pc --> choose pc as src 1 for alu
                 ALUSrcB = 2'b10; // alu src b is the constant 4
-                ALU_control = 3'b000; // alu control is 0 --> add
+                ALU_control = 4'b0000; // alu control is 0 --> add
                 PCUpdate = 1'b1;
                 // we should be updating current instr right here
             end
@@ -85,7 +85,7 @@ module controller (
                 // always calculate the branch target as though the instruction were a branch
                 ALUSrcA = 2'b01; // Should be OldPC
                 ALUSrcB = 2'b01; // immedext
-                ALU_control = 3'b000; // Addition
+                ALU_control = 3'b0000; // Addition
                 case (op_code)
                     LOAD_CODE: begin
                         next_state = MEMADR; // if we are in a lb/lh/lw instr we go to MEM_ADR
@@ -111,7 +111,7 @@ module controller (
             MEMADR: begin // get memory adress to read from
                 ALUSrcA <= 2'b10; // Set ALU signals rs1 and immed12
                 ALUSrcB <= 2'b01;
-                ALU_control <= 3'b000; // ALU set to add mode
+                ALU_control <= 4'b0000; // ALU set to add mode
                 case (op_code)
                     LOAD_CODE: begin
                         next_state = MEMREAD // if we are in a lb/lh/lw instr we go to MEMREAD
@@ -147,30 +147,28 @@ module controller (
                 memwrite <= 1'b1;
             end
 
-            EXECUTER: begin // We need to implement slt and sltu
+            EXECUTER: begin 
                 next_state = ALUWB;
                 ALUSrcA <= 2'b10; // rs1
                 ALUSrcB <= 2'b00; // rs2
                 case(fun7, funct3)
-                    1'b0, 3'b000: ALU_control = 3'b010; // ADD !!! In textbook add is 000
-                    1'b1, 3'b000: ALU_control = 3'b110; // SUB
-                    1'b0, 3'b111: ALU_control = 3'b000; // AND
-                    1'b0, 3'b110: ALU_control = 3'b001; // OR
-                    1'b0, 3'b100: ALU_control = 3'b011; // XOR
-                    1'b0, 3'b001: ALU_control = 3'b100; // SLL
-                    1'b0, 3'b101: ALU_control = 3'b101; // SRL
-                    1'b1, 3'b101: ALU_control = 3'b111; // SRA
+                    1'b0, 3'b000: ALU_control = 4'b0000; // ADD !!! In textbook add is 000
+                    1'b1, 3'b000: ALU_control = 4'b0110; // SUB
+                    1'b0, 3'b111: ALU_control = 4'b0001; // AND
+                    1'b0, 3'b110: ALU_control = 4'b0010; // OR
+                    1'b0, 3'b100: ALU_control = 4'b0011; // XOR
+                    1'b0, 3'b001: ALU_control = 4'b0100; // SLL
+                    1'b0, 3'b101: ALU_control = 4'b0101; // SRL
+                    1'b1, 3'b101: ALU_control = 4'b0111; // SRA
+                    1'b0, 3'b010: ALU_control = 4'b1010; // SLT Signed
+                    1'b0, 3'b011: ALU_control = 4'b1001; // SLT Unsigned
                 endcase
             end
 
             ALUWB: begin
                 next_state = FETCH;
                 ResultSrc = 2'b00; // result from ALU
-                case (funct3, sign)
-                    3'b010, 1'b1: RegWrite = 1'b0; // will not write to register if sign is negative for slt
-                    3'b011, 1'b1: RegWrite = 1'b0;
-                    default: RegWrite = 1'b1; //writes to rd
-                endcase
+                default: RegWrite = 1'b1; //writes to rd
             end
 
             BRANCH: begin
@@ -179,8 +177,8 @@ module controller (
                 ResultSrc = 2'b00;
                 ALU_control = 3'b001; // Subtract (according to textbook)
                 case(funct3)
-                    3'b110: ALU_control = // Sub unsigned -- how do we do this again??
-                    3'b111: ALU_control // Sub unsigned
+                    3'b110: ALU_control = 4'b1101; // Sub unsigned -- how do we do this again??
+                    3'b111: ALU_control = 4'b1101; // Sub unsigned
                     default: ALU_control = 3'b001;
                 endcase
                 case(funct3, sign, zero)
@@ -198,15 +196,15 @@ module controller (
                 ALUSrcA = 2'b10;
                 ALUSrcB = 2'b01;
                 case(funct3)
-                    3'b000: ALU_control = 3'b010; // ADD !!! In textbook add is 000
-                    3'b111: ALU_control = 3'b000; // AND
-                    3'b110: ALU_control = 3'b001; // OR
-                    3'b100: ALU_control = 3'b011; // XOR
-                    3'b001: ALU_control = 3'b100; // SLL
-                    3'b101: ALU_control = 3'b101; // SRL
-                    3'b101: ALU_control = 3'b111; // SRA --THIS ONE HAS A FUNCT 7 SO WE NEED TO IMPORT THAT SOMEHOW.
-                    3'b010: ALU_control = 3'b110;
-                    3'b011: ALU_control = 3'b110; // slt and stlu
+                    3'b000: ALU_control = 4'b0000; // ADD !!! In textbook add is 000
+                    3'b111: ALU_control = 4'b0001; // AND
+                    3'b110: ALU_control = 4'b0010; // OR
+                    3'b100: ALU_control = 4'b0011; // XOR
+                    3'b001: ALU_control = 4'b0100; // SLL
+                    3'b101: ALU_control = 4'b0101; // SRL
+                    3'b101: ALU_control = 4'b0111; // SRA --THIS ONE HAS A FUNCT 7 SO WE NEED TO IMPORT THAT SOMEHOW.
+                    3'b010: ALU_control = 4'b1010; // SLT
+                    3'b011: ALU_control = 4'b1001; // SLTU
                 endcase
             end
 
@@ -214,7 +212,7 @@ module controller (
                 next_state = ALUWB;
                 ALUSrcA = 2'b01;
                 ALUSrcB = 2'b10;
-                ALU_control = 3'b000; // ADD - we need to normalize these
+                ALU_control = 4'b0000; // ADD - we need to normalize these
                 ResultSrc = 2'b00;
                 PCUpdate = 1'b1;
             end
@@ -223,42 +221,19 @@ module controller (
                 next_state = ALUWB;
                 ALUSrcA = 2'b10; // Rrs1
                 ALUSrcB = 2'b01; // Signed offset
-                ALU_control = 3'b000;
+                ALU_control = 4'b0000;
                 ResultSrc = 2'b00;
                 PCWrite = 1'b1; // updates the pc with the new adress
             end
 
         endcase
     end
-
-    always @(*) begin
-        case (ALUOp, fun7, fun3)
-            // R-type instructions
-            4'b0010, 1'b0, 3'b000: ALU_control = 4'b0010; // ADD
-            4'b0010, 1'b1, 3'b000: ALU_control = 4'b0110; // SUB
-            4'b0010, 1'b0, 3'b111: ALU_control = 4'b0000; // AND
-            4'b0010, 1'b0, 3'b110: ALU_control = 4'b0001; // OR
-            4'b0010, 1'b0, 3'b100: ALU_control = 4'b0011; // XOR
-            4'b0010, 1'b0, 3'b001: ALU_control = 4'b0100; // SLL
-            4'b0010, 1'b0, 3'b101: ALU_control = 4'b0101; // SRL
-            4'b0010, 1'b1, 3'b101: ALU_control = 4'b0111; // SRA
-
-            // I-type instructions
-            4'b0000, _, 3'b000: ALU_control_signal = 4'b0010; // ADDI
-            4'b0000, _, 3'b111: ALU_control_signal = 4'b0000; // ANDI
-            4'b0000, _, 3'b110: ALU_control_signal = 4'b0001; // ORI
-            4'b0000, _, 3'b100: ALU_control_signal = 4'b0011; // XORI
-            4'b0000, _, 3'b001: ALU_control_signal = 4'b0100; // SLLI
-            4'b0000, _, 3'b101: ALU_control_signal = fun7 ? 4'b0111 : 4'b0105; // SRLI/SRAI
-
-            // Load/Store instructions
-            4'b0001, _, _: ALU_control_signal = 4'b0010; // ADD for address calculation
-
-            // Branch instructions
-            4'b0011, _, _: ALU_control_signal = 4'b011
-            default: ALU_control_signal = 4'b0000; // Default case
-        endcase
-    end
-
-
-endmodule
+//
+//          4'b0010, 1'b0, 3'b000: ALU_control = 4'b0000; // ADD
+//          4'b0010, 1'b1, 3'b000: ALU_control = 4'b0110; // SUB
+//          4'b0010, 1'b0, 3'b111: ALU_control = 4'b0001; // AND
+//          4'b0010, 1'b0, 3'b110: ALU_control = 4'b0010; // OR
+//          4'b0010, 1'b0, 3'b100: ALU_control = 4'b0011; // XOR
+//          4'b0010, 1'b0, 3'b001: ALU_control = 4'b0100; // SLL
+//          4'b0010, 1'b0, 3'b101: ALU_control = 4'b0101; // SRL
+//          4'b0010, 1'b1, 3'b101: ALU_control = 4'b0111; // SRA
