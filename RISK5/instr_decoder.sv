@@ -63,11 +63,24 @@ module instr_decoder (
                 rs1 = current_instr[12:16]
             end
             LUI_CODE: begin
-                immed12 = current_instr[0:19]
+                immed20 = current_instr[0:19]
+                funct3 = current_instr[17:19]
                 rd = current_instr[20:24]
             end
             AUIPC_CODE: begin
-                immed12 = current_instr[0:19]
+                immed20 = current_instr[0:19]
+                funct3 = current_instr[17:19]
+                rd = current_instr[20:24]
+            end
+            JAL_CODE: begin
+                immed20 = current_instr[0:19]
+                funct3 = current_instr[17:19]
+                rd = current_instr[20:24]
+            end
+            JALR_CODE: begin
+                immed12 = current_instr[0:11]
+                funct3 = current_instr[17:19]
+                rs1 = current_instr[12:16]
                 rd = current_instr[20:24]
             end
         endcase
