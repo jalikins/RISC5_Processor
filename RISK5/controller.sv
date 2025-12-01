@@ -4,7 +4,7 @@ module controller (
     input logic fun7,
     input logic[2:0] funct3,
     input logic zero, // checks if ALU out is 0
-    input logic sign, // checks if ALU out is pos (1) or neg (0) (default to 1)
+
     output logic[2:0] ALU_control,
     output logic[1:0] ALUSrcA,
     output logic[1:0] ALUSrcB,
@@ -107,6 +107,15 @@ module controller (
                     JAL_CODE: begin
                         next_state = JAL;
                     end
+                    JALR_CODE: begin
+                        next_state = JALR;
+                    end
+                    LUI_CODE: begin
+                        next_state = LUI;
+                    end
+                    AUIPC: begin
+                        next_state = AUIPC;
+                    end
                 endcase
             end 
 
@@ -126,7 +135,7 @@ module controller (
 
             MEMREAD: begin // send ALU_out as input to mem adress port to read from that adress
                 next_state = MEMWB // if we are in a lb/lh/lw instr we go to MEM_ADR
-                ResultSrc <= 2'b0; // routes ALUout through result mux
+                ResultSrc <= 2'b00; // routes ALUout through result mux
                 AdrSrc <= 1'b0; // routes ALUout through data adress
                 // data is read from ALUout adress
                 // data is stored in data register
@@ -233,10 +242,10 @@ module controller (
 
             AUIPC: begin
                 next_state = ALUWB;
-                ALU_control = 4'b0000; // ADDING
-                ALUSrcA = 2'b01; // Old PC
-                ALUSrcB = 2'b01; // Imm gen
-                ResultSrc = 2'b00; // Writes the previous ALU out ie. old PC to reg
+                ALU_control <= 4'b0000; // ADDING
+                ALUSrcA <= 2'b01; // Old PC
+                ALUSrcB <= 2'b01; // Imm gen
+                ResultSrc <= 2'b00; // Writes the previous ALU out ie. old PC to reg
             end
 
         endcase
