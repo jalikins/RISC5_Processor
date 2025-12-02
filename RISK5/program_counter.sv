@@ -5,7 +5,9 @@ module program_counter(
     output logic[31:0] current_pc
 );
     always_comb begin
-        current_pc <= result;
+        if (PCWrite) begin
+            current_pc <= result;
+        end
     end
 
 endmodule

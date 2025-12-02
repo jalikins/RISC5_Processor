@@ -44,9 +44,9 @@ module top(
 
     program_counter u2 (  
         .clk            (clk), 
-        .pc_sel         (pc_sel),
+        .PCWrite        (PCWrite),
         .result         (result),
-        .pc             (pc)
+        .current_pc     (current_pc)
     );
 
     register_file u3 (
@@ -56,9 +56,9 @@ module top(
         .rs1            (rs1),
         .rs2            (rs2),
         .rd             (rd),
-        .wd             (wd),
-        .rd1            (rd1),
-        .rd2            (rd2)
+        .result         (result),
+        .rs1_data       (rs1_data),
+        .rs2_data       (rs2_data)
     );
 
     ALU_unit u4 (
@@ -120,6 +120,7 @@ module top(
 
     always_ff @(posedge clk) begin
         if (PCWrite == 1'b1) begin
+            old_pc <= current_pc;
             current_pc <= result;
         end
         if (memwrite == 1'b0) begin
@@ -137,6 +138,13 @@ module top(
         if (IRWrite = 1'b1) begin
             current_instr = read_data; // Current instruction is the data we read form instr mem
         end
+        case (ResultSrc) 
+            2'b00: result = ALU_out;
+            2'b01: result = data;
+            2'b10: reult = result;
+        endcase
+        ALU_out <= ALU_result;
+        data <= read_data;
     end
 
 endmodule

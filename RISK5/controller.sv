@@ -45,7 +45,7 @@ module controller (
         MEMADR = 4'b0010,
         MEMREAD = 4'b0011,
         MEMWB = 4'b0100,
-        MEMWRITE = 4'b0101, // they use memwrite twice in two different ways, all caps is for fsm
+        MEMWRITE = 4'b0101, // textbook uses memwrite twice in two different ways, all caps is for fsm
         EXECUTER = 4'b0111,
         ALUWB = 4'b1000,
         BRANCH = 4'b1001,
@@ -67,17 +67,17 @@ module controller (
 
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
         state <= next_state;
-        PCWrite = (branch & zero) | PCUpdate; // changed from textbook from AND to NOR
         case (state)
 
             FETCH: begin
                 next_state = DECODE; // write pc to old_pc
-                AdrSrc <= 0; // fetch adress from pc
-                IRWrite <= 1; // writes to instruction reg
+                AdrSrc <= 1'b0; // fetch adress from pc
+                IRWrite <= 1'b1; // writes to instruction reg
                 ALUSrcA = 2'b00; // updating the pc --> choose pc as src 1 for alu
                 ALUSrcB = 2'b10; // alu src b is the constant 4
                 ALU_control = 4'b0000; // alu control is 0 --> add
                 PCUpdate = 1'b1;
+                ImmSrc = 2'b00; // immediate extender gets 12 bit sign extended for branching
                 // we should be updating current instr right here
             end
 
@@ -112,7 +112,7 @@ module controller (
                     LUI_CODE: begin
                         next_state = LUI;
                     end
-                    AUIPC: begin
+                    AUIPC_CODE: begin
                         next_state = AUIPC;
                     end
                 endcase
@@ -246,8 +246,8 @@ module controller (
                 ALUSrcB <= 2'b01; // Imm gen
                 ResultSrc <= 2'b00; // Writes the previous ALU out ie. old PC to reg
             end
-
         endcase
+        PCWrite = (branch & zero) | PCUpdate;
     end
 endmodule
 //

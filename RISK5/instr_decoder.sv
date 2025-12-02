@@ -5,6 +5,7 @@ module instr_decoder (
     output logic[11:0] immed12,
     output logic[6:0] op_code,
     output logic[6:0] funct7,
+    output logic fun7,
     output logic[2:0] funct3,
     output logic[2:0] rs2,
     output logic[2:0] rs1,
@@ -33,6 +34,7 @@ module instr_decoder (
         case (op_code)
             RTYPE_CODE: begin
                 funct7 = current_instr[0:6]
+                fun7 = current_instr[1]
                 funct3 = current_instr[17:19]
                 rs2 = current_instr[7:11]
                 rs1 = current_instr[12:16]
