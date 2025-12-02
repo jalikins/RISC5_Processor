@@ -1,8 +1,10 @@
 `include "memory.sv" 
 `include "program_counter.sv" 
 `include "register_file.sv" 
-`include "alu.sv"
+`include "ALU_unit.sv"
 `include "instr_decoder.sv"
+`include "immediate_extender.sv"
+`include "controller.sv"
 
 
 module top(
@@ -59,15 +61,15 @@ module top(
         .rd2            (rd2)
     );
 
-    alu u4 (
+    ALU_unit u4 (
         .clk            (clk), 
         .rs1_data       (rs1_data),
         .rs2_data       (rs2_data),
         .immed12        (immed12),
         .pc             (pc), // for jump/branch
-        .funct3         (funct3),
-        .funct7         (funct7),
-        .result         (result)
+        .ALU_control    (ALU_control),
+        .zero           (zero),
+        .ALU_out        (ALU_out)
     );
 
     instr_decoder u5 (
@@ -83,13 +85,57 @@ module top(
         .rd             (rd)
     );
 
+    immediate_extender u6 (
+        .clk            (clk),
+        .immed12        (immed12),
+        .immed20        (immed20),
+        .ImmSrc         (ImmSrc),
+        .immed_ext      (immed_ext)
+    );
+
+    controller u7 (
+        .clk            (clk),
+        .op_code        (op_code),
+        .fun7           (fun7),
+        .funct3         (funct3),
+        .zero           (zero), // checks if ALU out is 0
+
+        .ALU_control    (ALU_control),
+        .ALUSrcA        (ALUSrcA),
+        .ALUSrcB        (ALUSrcB),
+        .ImmSrc         (ImmSrc),
+        .ResultSrc      (ResultSrc),
+        .PCWrite        (PCWrite),
+        .AdrSrc         (AdrSrc),
+        .MemWrite       (MemWrite),
+        .IRWrite        (IRWrite),
+        .RegWrite       (RegWrite)
+    );
+
+    initial begin
+        AdrSrc = 0;
+        current_pc = 4'h2000;// lowest point in instr memory
+        funct3 = 3'b010;
+    end
 
     always_ff @(posedge clk) begin
-        if (IRWrite == 1) begin
-            // get a new current_instr
-            // feed inputs into ALU
-            // update register file
-            // update pc
+        if (PCWrite == 1'b1) begin
+            current_pc <= result;
+        end
+        if (memwrite == 1'b0) begin
+            case (AdrSrc) 
+                1'b0: read_address = current_pc;
+                1'b1: read_address = result;
+            endcase
+        end else if (memwrite == 1'b1) begin
+            case (AdrSrc) 
+                1'b0: write_address = current_pc;
+                1'b1: write_address = result;
+            endcase
+            write_data = rs2_data
+        end
+        if (IRWrite = 1'b1) begin
+            current_instr = read_data; // Current instruction is the data we read form instr mem
         end
     end
 

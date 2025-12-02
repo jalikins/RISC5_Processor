@@ -1,7 +1,8 @@
 module immediate_extender(
-    input logic[11:0] immed12;
-    input logic[19:0] immed20;
-    input logic[1:0] ImmSrc;
+    input logic clk,
+    input logic[11:0] immed12,
+    input logic[19:0] immed20,
+    input logic[1:0] ImmSrc,
     output logic immed_ext
 );
     always_comb begin

@@ -14,8 +14,7 @@ module controller (
     output logic AdrSrc,
     output logic MemWrite,
     output logic IRWrite,
-    output logic RegWrite,
-    
+    output logic RegWrite
 );
 // not done brah
 

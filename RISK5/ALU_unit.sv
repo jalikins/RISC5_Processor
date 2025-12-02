@@ -1,28 +1,48 @@
 module ALU_unit(
-    input logic[31:0] A,
-    input logic[31:0] B,
+    input logic clk,
+    input logic[1:0] ALUSrcA,
+    input logic[1:0] ALUSrcB,
+    input logic[31:0] rs1,
+    input logic[31:0] rs2,
+    input logic[31:0] immed_ext,
+    input logic[31:0] old_pc,
+    input logic[31:0] current_pc,
     input [3:0] alu_control,
     output reg zero,
-    output reg[31:0] alu_result
+    output reg[31:0] ALU_out
 );
+
+    logic [31:0] A;
+    logic [31:0] B;
+
     always_comb begin
+        case (ALUSrcA)
+            2'b00: A = current_pc,
+            2'b01: A = old_pc,
+            2'b10: A = rs1
+        endcase
+        case (ALUSrcB)
+            2'b00: B = rs2,
+            2'b01: B = immed_ext,
+            2'b10: B = 4
+        endcase
         case (alu_control)
-            4'b0000: alu_result = $signed(A + B); // ADD (signed)
-            4'b0110: alu_result = $signed(A - B); // SUBTRACT
-            4'b0010: alu_result = A | B; // OR
-            4'b0001: alu_result = A & B; // AND
-            4'b0100: alu_result = A << B[4:0]; // SLL
-            4'b0101: alu_result = A >> B[4:0]; // SRL
-            4'b0111: alu_result = $signed(A) >>> B[4:0]; // SRA
-            4'b1001: alu_result = (A < B) ? 32'b1 : 32'b0; // SET LESS THAN Unsinged
-            4'b1010: alu_result = ($signed(A) < $signed(B)) ? 32'b1 : 32'b0; // SLT signed
-            4'b1100: alu_result = ~(A | B); // NOR
-            4'b1101: alu_result = A - B; // Subtract unsigned
-            default: alu_result = 32'b0; // DEFAULT
+            4'b0000: ALU_out = $signed(A + B); // ADD (signed)
+            4'b0110: ALU_out = $signed(A - B); // SUBTRACT
+            4'b0010: ALU_out = A | B; // OR
+            4'b0001: ALU_out = A & B; // AND
+            4'b0100: ALU_out = A << B[4:0]; // SLL
+            4'b0101: ALU_out = A >> B[4:0]; // SRL
+            4'b0111: ALU_out = $signed(A) >>> B[4:0]; // SRA
+            4'b1001: ALU_out = (A < B) ? 32'b1 : 32'b0; // SET LESS THAN Unsinged
+            4'b1010: ALU_out = ($signed(A) < $signed(B)) ? 32'b1 : 32'b0; // SLT signed
+            4'b1100: ALU_out = ~(A | B); // NOR
+            4'b1101: ALU_out = A - B; // Subtract unsigned
+            default: ALU_out = 32'b0; // DEFAULT
         endcase
 
         // zero flag
-        zero = (alu_result == 32'b0) ? 1'b1 : 1'b0;
+        zero = (ALU_out == 32'b0) ? 1'b1 : 1'b0;
     end
 
 
