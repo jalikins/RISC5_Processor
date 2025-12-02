@@ -4,12 +4,14 @@ module controller (
     input logic fun7,
     input logic[2:0] funct3,
     input logic zero, // checks if ALU out is 0
+    input logic sign,
 
     output logic[2:0] ALU_control,
     output logic[1:0] ALUSrcA,
     output logic[1:0] ALUSrcB,
     output logic[1:0] ImmSrc,
     output logic[1:0] ResultSrc,
+//    output logic decode,
     output logic PCWrite,
     output logic AdrSrc,
     output logic MemWrite,
@@ -58,11 +60,8 @@ module controller (
 
     state_t state, next_state;
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) // Need to connect to DONE state somehow
-            state <= FETCH;
-        else
-            state <= next_state;
+    initial begin
+        AdrSrc = 0;
     end
 
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
@@ -124,18 +123,19 @@ module controller (
                 ALU_control <= 4'b0000; // ALU set to add mode
                 case (op_code)
                     LOAD_CODE: begin
-                        next_state = MEMREAD // if we are in a lb/lh/lw instr we go to MEMREAD
+                        next_state = MEMREAD; // if we are in a lb/lh/lw instr we go to MEMREAD
                     end
                     STORE_CODE: begin
-                        next_state = MEMWRITE // if we are saving a w/h/b we go to mem write
+                        next_state = MEMWRITE; // if we are saving a w/h/b we go to mem write
                     end
                 endcase
             end
 
             MEMREAD: begin // send ALU_out as input to mem adress port to read from that adress
-                next_state = MEMWB // if we are in a lb/lh/lw instr we go to MEM_ADR
+                next_state = MEMWB; // if we are in a lb/lh/lw instr we go to MEM_ADR
                 ResultSrc <= 2'b00; // routes ALUout through result mux
                 AdrSrc <= 1'b0; // routes ALUout through data adress
+                ALU_control <= 4'b1111;
                 // data is read from ALUout adress
                 // data is stored in data register
             end
@@ -144,6 +144,7 @@ module controller (
                 next_state = FETCH;
                 ResultSrc <= 2'b01; // Selects the data as the result
                 RegWrite <= 1'b1; // Writing data to the register file
+                ALU_control <= 4'b1111;
             end
 
             MEMWRITE: begin
@@ -151,30 +152,32 @@ module controller (
                 ResultSrc <= 2'b00;
                 AdrSrc <= 1'b1;
                 memwrite <= 1'b1;
+                ALU_control <= 4'b1111;
             end
 
             EXECUTER: begin 
                 next_state = ALUWB;
                 ALUSrcA <= 2'b10; // rs1
                 ALUSrcB <= 2'b00; // rs2
-                case(fun7, funct3)
-                    1'b0, 3'b000: ALU_control = 4'b0000; // ADD !!! In textbook add is 000
-                    1'b1, 3'b000: ALU_control = 4'b0110; // SUB
-                    1'b0, 3'b111: ALU_control = 4'b0001; // AND
-                    1'b0, 3'b110: ALU_control = 4'b0010; // OR
-                    1'b0, 3'b100: ALU_control = 4'b0011; // XOR
-                    1'b0, 3'b001: ALU_control = 4'b0100; // SLL
-                    1'b0, 3'b101: ALU_control = 4'b0101; // SRL
-                    1'b1, 3'b101: ALU_control = 4'b0111; // SRA
-                    1'b0, 3'b010: ALU_control = 4'b1010; // SLT Signed
-                    1'b0, 3'b011: ALU_control = 4'b1001; // SLT Unsigned
+                case({fun7, funct3})
+                    {1'b0, 3'b000}: ALU_control = 4'b0000; // ADD !!! In textbook add is 000
+                    {1'b1, 3'b000}: ALU_control = 4'b0110; // SUB
+                    {1'b0, 3'b111}: ALU_control = 4'b0001; // AND
+                    {1'b0, 3'b110}: ALU_control = 4'b0010; // OR
+                    {1'b0, 3'b100}: ALU_control = 4'b0011; // XOR
+                    {1'b0, 3'b001}: ALU_control = 4'b0100; // SLL
+                    {1'b0, 3'b101}: ALU_control = 4'b0101; // SRL
+                    {1'b1, 3'b101}: ALU_control = 4'b0111; // SRA
+                    {1'b0, 3'b010}: ALU_control = 4'b1010; // SLT Signed
+                    {1'b0, 3'b011}: ALU_control = 4'b1001; // SLT Unsigned
                 endcase
             end
 
             ALUWB: begin
                 next_state = FETCH;
                 ResultSrc <= 2'b00; // result from ALU
-                default: RegWrite <= 1'b1; //writes to rd
+                RegWrite <= 1'b1; //writes to rd
+                ALU_control <= 4'b1111;
             end
 
             BRANCH: begin
@@ -188,12 +191,12 @@ module controller (
                     3'b111: ALU_control <= 4'b1101; // Sub unsigned
                     default: ALU_control <= 4'b0110;
                 endcase
-                case(funct3, sign, zero)
-                    3'b000, 1'b1, 1'b1: PCUpdate <= 1'b1; // if ALU returns 0, we branch
-                    3'b001, 1'b1, 1'b0: PCUpdate <= 1'b1; // if ALU doesn't return 0, we branch
-                    3'b001, 1'b0, 1'b0: PCUpdate <= 1'b1; // if ALU doesn't return 0, we branch
-                    3'b100, 1'b0, 1'b0: PCUpdate <= 1'b1; // blt - only branch if sign is negative
-                    3'b101, 1'b1, 1'b0: PCUpdate <= 1'b1; // bge - only branch if sign is positive
+                case({funct3, sign, zero})
+                    {3'b000, 1'b1, 1'b1}: PCUpdate <= 1'b1; // if ALU returns 0, we branch
+                    {3'b001, 1'b1, 1'b0}: PCUpdate <= 1'b1; // if ALU doesn't return 0, we branch
+                    {3'b001, 1'b0, 1'b0}: PCUpdate <= 1'b1; // if ALU doesn't return 0, we branch
+                    {3'b100, 1'b0, 1'b0}: PCUpdate <= 1'b1; // blt - only branch if sign is negative
+                    {3'b101, 1'b1, 1'b0}: PCUpdate <= 1'b1; // bge - only branch if sign is positive
                     default: PCUpdate <= 1'b0;
                 endcase
             end
@@ -202,16 +205,16 @@ module controller (
                 next_state = ALUWB;
                 ALUSrcA <= 2'b10;
                 ALUSrcB <= 2'b01;
-                case(fun7, funct3)
-                    1'b0, 3'b000: ALU_control <= 4'b0000; // ADD !!! In textbook add is 000
-                    1'b0, 3'b111: ALU_control <= 4'b0001; // AND
-                    1'b0, 3'b110: ALU_control <= 4'b0010; // OR
-                    1'b0, 3'b100: ALU_control <= 4'b0011; // XOR
-                    1'b0, 3'b001: ALU_control <= 4'b0100; // SLL
-                    1'b0, 3'b101: ALU_control <= 4'b0101; // SRL __ 
-                    1'b1, 3'b101: ALU_control <= 4'b0111; // SRA __ need a case statement in decoder to give a fun7 for these if funct3 is 101
-                    1'b0, 3'b010: ALU_control <= 4'b1010; // SLT
-                    1'b0, 3'b011: ALU_control <= 4'b1001; // SLTU
+                case({fun7, funct3})
+                    {1'b0, 3'b000}: ALU_control <= 4'b0000; // ADD !!! In textbook add is 000
+                    {1'b0, 3'b111}: ALU_control <= 4'b0001; // AND
+                    {1'b0, 3'b110}: ALU_control <= 4'b0010; // OR
+                    {1'b0, 3'b100}: ALU_control <= 4'b0011; // XOR
+                    {1'b0, 3'b001}: ALU_control <= 4'b0100; // SLL
+                    {1'b0, 3'b101}: ALU_control <= 4'b0101; // SRL __ 
+                    {1'b1, 3'b101}: ALU_control <= 4'b0111; // SRA __ need a case statement in decoder to give a fun7 for these if funct3 is 101
+                    {1'b0, 3'b010}: ALU_control <= 4'b1010; // SLT
+                    {1'b0, 3'b011}: ALU_control <= 4'b1001; // SLTU
                 endcase
             end
 
@@ -237,6 +240,7 @@ module controller (
                 next_state = ALUWB;
                 RegWrite <= 1'b1;
                 ResultSrc <= 2'b11; // Should be immediate generator
+                ALU_control <= 4'b1111;
             end
 
             AUIPC: begin
@@ -263,3 +267,4 @@ endmodule
 //          4'b1010 // SET LESS THAN SIGNED
 //          4'b1100 // NOR
 //          4'b1101 // Subtract unsigned
+//          4'b1111 // nothing

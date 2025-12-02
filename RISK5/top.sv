@@ -1,4 +1,4 @@
-`include "memory.sv" 
+`include "memory\memory.sv" 
 `include "program_counter.sv" 
 `include "register_file.sv" 
 `include "ALU_unit.sv"
@@ -46,13 +46,12 @@ module top(
         .clk            (clk), 
         .PCWrite        (PCWrite),
         .result         (result),
-        .current_pc     (current_pc)
+        .current_pc     (current_pc),
     );
 
     register_file u3 (
         .clk            (clk), 
-        .rst            (rst),
-        .rw             (rw),
+        .result         (result),
         .rs1            (rs1),
         .rs2            (rs2),
         .rd             (rd),
@@ -65,11 +64,13 @@ module top(
         .clk            (clk), 
         .rs1_data       (rs1_data),
         .rs2_data       (rs2_data),
-        .immed12        (immed12),
-        .pc             (pc), // for jump/branch
+        .immed_ext      (immed_ext),
+        .old_pc         (old_pc), // for jump/branch
+        .current_pc     (current_pc),
         .ALU_control    (ALU_control),
         .zero           (zero),
-        .ALU_out        (ALU_out)
+        .ALU_result     (ALU_result),
+        .sign           (sign)
     );
 
     instr_decoder u5 (
@@ -99,6 +100,7 @@ module top(
         .fun7           (fun7),
         .funct3         (funct3),
         .zero           (zero), // checks if ALU out is 0
+        .sign           (sign),
 
         .ALU_control    (ALU_control),
         .ALUSrcA        (ALUSrcA),
@@ -109,14 +111,8 @@ module top(
         .AdrSrc         (AdrSrc),
         .MemWrite       (MemWrite),
         .IRWrite        (IRWrite),
-        .RegWrite       (RegWrite)
+        .RegWrite       (RegWrite),
     );
-
-    initial begin
-        AdrSrc = 0;
-        current_pc = 4'h2000;// lowest point in instr memory
-        funct3 = 3'b010;
-    end
 
     always_ff @(posedge clk) begin
         if (PCWrite == 1'b1) begin
@@ -133,9 +129,9 @@ module top(
                 1'b0: write_address = current_pc;
                 1'b1: write_address = result;
             endcase
-            write_data = rs2_data
+            write_data = rs2_data;
         end
-        if (IRWrite = 1'b1) begin
+        if (IRWrite) begin
             current_instr = read_data; // Current instruction is the data we read form instr mem
         end
         case (ResultSrc) 

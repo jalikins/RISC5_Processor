@@ -16,10 +16,10 @@ module register_file(
         end
 
 
-    always_comb begin
+    always_ff@(posedge clk) begin
         if (RegWrite) begin
             registers[rd] <= result; // Writing to reg file
-        end
+        end 
         rs1_data <= (rs1 == 5'b00000) ? 32'b0 : registers[rs1]; // Reading from register file
         rs2_data <= (rs2 == 5'b00000) ? 32'b0 : registers[rs2];
     end
