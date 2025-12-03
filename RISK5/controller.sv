@@ -37,10 +37,6 @@ module controller (
     // S-type
     parameter STORE_CODE = 7'b0100011;
 
-    logic PCUpdate = 1'b0;
-    logic branch = 1'b0;
-
-
     typedef enum logic [3:0] { // set up fsm--will need to expand by instruction
         FETCH  = 4'b0000,
         DECODE   = 4'b0001,
@@ -61,6 +57,7 @@ module controller (
     state_t state, next_state;
 
     initial begin
+        state = FETCH;
         next_state = FETCH;
         AdrSrc = 1'b0;
         IRWrite = 1'b1;
@@ -80,7 +77,7 @@ module controller (
                 ALU_control = 4'b0000; // alu control is 0 --> add
                 PCUpdate = 1'b1;
                 ImmSrc = 2'b00; // immediate extender gets 12 bit sign extended for branching
-                ResultSrc = 2'b01;
+                ResultSrc = 2'b10;
                 // we should be updating current instr right here
             end
 
