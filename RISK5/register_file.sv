@@ -2,7 +2,7 @@ module register_file(
     input logic clk,
     input logic RegWrite, // reg write
     input logic [4:0] rs1, rs2, rd, // source reg 1, source reg 2, destination reg
-    input logic [31:0] result, // write destination
+    input logic [31:0] result, // result
     output logic [31:0] rs1_data, rs2_data // read data 1, read data 2
 );
 

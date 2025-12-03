@@ -111,7 +111,7 @@ module top(
         .AdrSrc         (AdrSrc),
         .MemWrite       (MemWrite),
         .IRWrite        (IRWrite),
-        .RegWrite       (RegWrite),
+        .RegWrite       (RegWrite)
     );
 
     always_ff @(posedge clk) begin
@@ -136,8 +136,9 @@ module top(
         end
         case (ResultSrc) 
             2'b00: result = ALU_out;
-            2'b01: result = data;
-            2'b10: reult = result;
+            2'b01: result = read_data;
+            2'b10: result = ALU_resultresult;
+            2'b11: result = immed_ext;
         endcase
         ALU_out <= ALU_result;
         data <= read_data;

@@ -170,10 +170,11 @@ module controller (
                     {1'b1, 3'b101}: ALU_control = 4'b0111; // SRA
                     {1'b0, 3'b010}: ALU_control = 4'b1010; // SLT Signed
                     {1'b0, 3'b011}: ALU_control = 4'b1001; // SLT Unsigned
+//                  default: ALU_control = 4'b0000; // default to add    
                 endcase
             end
 
-            ALUWB: begin
+            ALUWB: begin // Write ALU result to register file
                 next_state = FETCH;
                 ResultSrc <= 2'b00; // result from ALU
                 RegWrite <= 1'b1; //writes to rd
@@ -185,9 +186,8 @@ module controller (
                 ALUSrcA <= 2'b10; // rs1
                 ALUSrcB <= 2'b00; // rs2
                 ResultSrc <= 2'b00;
-                ALU_control <= 4'b0110; // Subtract (according to textbook)
                 case(funct3)
-                    3'b110: ALU_control <= 4'b1101; // Sub unsigned -- how do we do this again??
+                    3'b110: ALU_control <= 4'b1101; // Sub unsigned
                     3'b111: ALU_control <= 4'b1101; // Sub unsigned
                     default: ALU_control <= 4'b0110;
                 endcase
@@ -197,6 +197,8 @@ module controller (
                     {3'b001, 1'b0, 1'b0}: PCUpdate <= 1'b1; // if ALU doesn't return 0, we branch
                     {3'b100, 1'b0, 1'b0}: PCUpdate <= 1'b1; // blt - only branch if sign is negative
                     {3'b101, 1'b1, 1'b0}: PCUpdate <= 1'b1; // bge - only branch if sign is positive
+                    {3'b110, 1'b0, 1'b0}: PCUpdate <= 1'b1;
+                    {3'b111, 1'b1' 1'b0}: PCUpdate <= 1'b1;
                     default: PCUpdate <= 1'b0;
                 endcase
             end
@@ -233,7 +235,7 @@ module controller (
                 ALUSrcB <= 2'b01; // Signed offset
                 ALU_control <= 4'b0000;
                 ResultSrc <= 2'b00;
-                PCWrite <= 1'b1; // updates the pc with the new adress
+                PCUpdate <= 1'b1; // updates the pc with the new adress
             end
 
             LUI: begin
