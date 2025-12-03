@@ -1,19 +1,20 @@
 module program_counter(
-    input logic clk,
     input logic PCWrite,
-    input logic result,
+    input logic[31:0] result,
+    input logic[31:0] old_pc,
     output logic[31:0] current_pc
 );
+
+    logic[31:0] current_pc_temp;
     initial begin
-        current_pc = 14'h00000000002000;// lowest point in instr memory
+        current_pc = 32'b0;// lowest point in instr memory
     end
     
-    logic[31:0] current_pc_temp;
     always_comb begin
         if (PCWrite) begin
-            current_pc <= result;
+            current_pc = result;
         end else begin
-            current_pc <= current_pc_temp;
+            current_pc = old_pc;
         end
     end
 

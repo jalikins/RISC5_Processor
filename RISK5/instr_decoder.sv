@@ -1,7 +1,6 @@
 module instr_decoder (
     input logic[31:0] current_instr,
     input logic clk,
-//    input logic decode,
     output logic[19:0] immed20,
     output logic[11:0] immed12,
     output logic[6:0] op_code,
@@ -46,86 +45,87 @@ module instr_decoder (
         rd      = '0;
         case (op_code)
             RTYPE_CODE: begin
-                funct7 = current_instr[0:6];
-//              funct7 = current_instr[31:25];
-                fun7 = current_instr[1];
-//              fun7 = current_instr[30];
-                funct3 = current_instr[17:19];
-//              funct3 = current_instr[14:12];
-                rs2 = current_instr[7:11];
-//              rs2 = current_instr[24:20];
-                rs1 = current_instr[12:16];
-//              rs1 = current_instr[19:15];
-                rd = current_instr[20:24]; // R-type instructions ???
-//              rd = current_instr[11:7];
+//                funct7 = current_instr[0:6];
+                funct7 = current_instr[31:25];
+//                fun7 = current_instr[1];
+                fun7 = current_instr[30];
+//                funct3 = current_instr[17:19];
+                funct3 = current_instr[14:12];
+//                rs2 = current_instr[7:11];
+                rs2 = current_instr[24:20];
+//                rs1 = current_instr[12:16];
+                rs1 = current_instr[19:15];
+//                rd = current_instr[20:24]; // R-type instructions ???
+                rd = current_instr[11:7];
             end
             LOGICI_CODE: begin
-                immed12 = current_instr[0:11];
-//              immed12 = current_instr[31:20];
-                funct3 = current_instr[17:19];
-//              funct3 = current_instr[14:12];
-                rs1 = current_instr[12:16];
-//              rs1 = current_instr[19:15];
-                rd = current_instr[20:24];
-//              rd = current_instr[11:7];
+//                immed12 = current_instr[0:11];
+              immed12 = current_instr[31:20];
+//                funct3 = current_instr[17:19];
+              funct3 = current_instr[14:12];
+//                rs1 = current_instr[12:16];
+              rs1 = current_instr[19:15];
+//                rd = current_instr[20:24];
+              rd = current_instr[11:7];
             end
             LOAD_CODE: begin
-                immed12 = current_instr[0:11];
-//              immed12 = current_instr[31:20];
-                funct3 = current_instr[17:19];
-//              funct3 = current_instr[14:12];
-                rs1 = current_instr[12:16];
-//              rs1 = current_instr[19:15];
-                rd = current_instr[20:24];
-//              rd = current_instr[11:7];
+//                immed12 = current_instr[0:11];
+              immed12 = current_instr[31:20];
+//                funct3 = current_instr[17:19];
+              funct3 = current_instr[14:12];
+//                rs1 = current_instr[12:16];
+              rs1 = current_instr[19:15];
+//                rd = current_instr[20:24];
+              rd = current_instr[11:7];
             end
             BRANCH_CODE: begin
-                immed12 = {current_instr[0], current_instr[24], current_instr[1:6], current_instr[20:23]};
-//             immed12 = {
-//                  current_instr[31],        // imm[12]
-//                  current_instr[7],         // imm[11]
-//                  current_instr[30:25],     // imm[10:5]
-//                  current_instr[11:8],      // imm[4:1]
-//                  1'b0                      // imm[0] = 0
-//              };
-                funct3 = current_instr[17:19];
-//              funct3 = current_instr[14:12];
-                rs2 = current_instr[7:11];
-//              rs2 = current_instr[24:20];
-                rs1 = current_instr[12:16];
-//              rs1 = current_instr[19:15];
+//                immed12 = {current_instr[0], current_instr[24], current_instr[1:6], current_instr[20:23]};
+                immed12 = {
+                    current_instr[31],        // imm[12]
+                    current_instr[7],         // imm[11]
+                    current_instr[30:25],     // imm[10:5]
+                    current_instr[11:8],      // imm[4:1]
+                    1'b0                      // imm[0] = 0
+                };
+//                funct3 = current_instr[17:19];
+                funct3 = current_instr[14:12];
+//                rs2 = current_instr[7:11];
+                rs2 = current_instr[24:20];
+//                rs1 = current_instr[12:16];
+                rs1 = current_instr[19:15];
             end
             STORE_CODE: begin
-                immed12 = {current_instr[0], current_instr[24], current_instr[1:6], current_instr[20:23]};
-//              immed12 = {current_instr[31:25], current_instr[11:7]};
-                funct3 = current_instr[17:19];
-//              funct3 = current_instr[14:12];
-                rs2 = current_instr[7:11];
-//              rs2 = current_instr[24:20];
-                rs1 = current_instr[12:16];
-//              rs1 = current_instr[19:15];
+//                immed12 = {current_instr[0], current_instr[24], current_instr[1:6], current_instr[20:23]};
+                immed12 = {current_instr[31:25], current_instr[11:7]};
+//                funct3 = current_instr[17:19];
+                funct3 = current_instr[14:12];
+//                rs2 = current_instr[7:11];
+                rs2 = current_instr[24:20];
+//                rs1 = current_instr[12:16];
+                rs1 = current_instr[19:15];
             end
             AUIPC_CODE,
             LUI_CODE: begin
-                immed20 = current_instr[0:19];
-//              immed20 = current_instr[31:12];
-                rd = current_instr[20:24];
-//              rd = current_instr[11:7];
+//                immed20 = current_instr[0:19];
+                immed20 = current_instr[31:12];
+//                rd = current_instr[20:24];
+                rd = current_instr[11:7];
             end
             JAL_CODE: begin
-                immed20 = current_instr[0:19];
-                rd = current_instr[20:24];
-//              rd = current_instr[11:7];
+//                immed20 = current_instr[0:19];
+                immed20 = current_instr[31:12];
+//                rd = current_instr[20:24];
+                rd = current_instr[11:7];
             end
             JALR_CODE: begin
-                immed12 = current_instr[0:11];
-//              immed12 = current_instr[31:20];
-                funct3 = current_instr[17:19];
-//              funct3 = current_instr[14:12];
-                rs1 = current_instr[12:16];
-//              rs1 = current_instr[19:15];
-                rd = current_instr[20:24];
-//              rd = current_instr[11:7];
+//                immed12 = current_instr[0:11];
+                immed12 = current_instr[31:20];
+//                funct3 = current_instr[17:19];
+                funct3 = current_instr[14:12];
+//                rs1 = current_instr[12:16];
+                rs1 = current_instr[19:15];
+//                rd = current_instr[20:24];
+                rd = current_instr[11:7];
             end
         endcase
     end

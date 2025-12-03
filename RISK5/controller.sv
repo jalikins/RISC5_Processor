@@ -151,7 +151,7 @@ module controller (
                 next_state = FETCH;
                 ResultSrc <= 2'b00;
                 AdrSrc <= 1'b1;
-                memwrite <= 1'b1;
+                MemWrite <= 1'b1;
                 ALU_control <= 4'b1111;
             end
 
@@ -198,7 +198,7 @@ module controller (
                     {3'b100, 1'b0, 1'b0}: PCUpdate <= 1'b1; // blt - only branch if sign is negative
                     {3'b101, 1'b1, 1'b0}: PCUpdate <= 1'b1; // bge - only branch if sign is positive
                     {3'b110, 1'b0, 1'b0}: PCUpdate <= 1'b1;
-                    {3'b111, 1'b1' 1'b0}: PCUpdate <= 1'b1;
+                    {3'b111, 1'b1, 1'b0}: PCUpdate <= 1'b1;
                     default: PCUpdate <= 1'b0;
                 endcase
             end

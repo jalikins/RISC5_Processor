@@ -23,7 +23,7 @@
         }
       },
       "cells": {
-        "$specify$10607": {
+        "$specify$2414": {
           "hide_name": 1,
           "type": "$specify2",
           "parameters": {
@@ -9969,7 +9969,7 @@
       "attributes": {
         "hdlname": "top",
         "top": "00000000000000000000000000000001",
-        "src": "top.sv:10.1-146.10"
+        "src": "top.sv:11.1-149.10"
       },
       "ports": {
         "clk": {
@@ -10002,8 +10002,8 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:31.7-43.6",
-            "module": "$paramod\\memory\\INIT_FILE=t0'",
+            "cell_src": "top.sv:32.7-45.6",
+            "module": "$paramod$d0e7b2713155091b7908820349510d558bd1f2a3\\memory",
             "module_hdlname": "memory",
             "module_src": "memory\\memory.sv:22.1-247.10"
           },
@@ -10020,7 +10020,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:45.21-50.6",
+            "cell_src": "top.sv:47.21-52.6",
             "module": "program_counter",
             "module_hdlname": "program_counter",
             "module_src": "program_counter.sv:1.1-20.10"
@@ -10038,7 +10038,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:52.19-61.6",
+            "cell_src": "top.sv:54.19-63.6",
             "module": "register_file",
             "module_hdlname": "register_file",
             "module_src": "register_file.sv:1.1-27.10"
@@ -10056,7 +10056,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:63.14-74.6",
+            "cell_src": "top.sv:65.14-76.6",
             "module": "ALU_unit",
             "module_hdlname": "ALU_unit",
             "module_src": "ALU_unit.sv:1.1-52.10"
@@ -10074,7 +10074,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:76.19-87.6",
+            "cell_src": "top.sv:78.19-89.6",
             "module": "instr_decoder",
             "module_hdlname": "instr_decoder",
             "module_src": "instr_decoder.sv:1.1-132.10"
@@ -10092,7 +10092,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:89.24-95.6",
+            "cell_src": "top.sv:91.24-97.6",
             "module": "immediate_extender",
             "module_hdlname": "immediate_extender",
             "module_src": "immediate_extender.sv:1.1-16.10"
@@ -10110,10 +10110,10 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:97.16-115.6",
+            "cell_src": "top.sv:99.16-117.6",
             "module": "controller",
             "module_hdlname": "controller",
-            "module_src": "controller.sv:1.1-256.10"
+            "module_src": "controller.sv:1.1-258.10"
           },
           "port_directions": {
           },
@@ -10126,56 +10126,56 @@
           "hide_name": 0,
           "bits": [ "x" ],
           "attributes": {
-            "src": "top.sv:15.21-15.24"
+            "src": "top.sv:16.21-16.24"
           }
         },
         "RGB_B": {
           "hide_name": 0,
           "bits": [ "x" ],
           "attributes": {
-            "src": "top.sv:14.21-14.26"
+            "src": "top.sv:15.21-15.26"
           }
         },
         "RGB_G": {
           "hide_name": 0,
           "bits": [ "x" ],
           "attributes": {
-            "src": "top.sv:13.21-13.26"
+            "src": "top.sv:14.21-14.26"
           }
         },
         "RGB_R": {
           "hide_name": 0,
           "bits": [ "x" ],
           "attributes": {
-            "src": "top.sv:12.21-12.26"
+            "src": "top.sv:13.21-13.26"
           }
         },
         "clk": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
-            "src": "top.sv:11.21-11.24"
+            "src": "top.sv:12.21-12.24"
           }
         },
         "rd": {
           "hide_name": 0,
           "bits": [ "x", "x", "x", "0", "0", "0" ],
           "attributes": {
-            "src": "top.sv:23.16-23.18"
+            "src": "top.sv:24.16-24.18"
           }
         },
         "rs1": {
           "hide_name": 0,
           "bits": [ "x", "x", "x", "0", "0", "0" ],
           "attributes": {
-            "src": "top.sv:21.16-21.19"
+            "src": "top.sv:22.16-22.19"
           }
         },
         "rs2": {
           "hide_name": 0,
           "bits": [ "x", "x", "x", "0", "0", "0" ],
           "attributes": {
-            "src": "top.sv:22.16-22.19"
+            "src": "top.sv:23.16-23.19"
           }
         },
         "u1.clk": {
@@ -10185,15 +10185,6 @@
             "hdlname": "u1 clk",
             "src": "memory\\memory.sv:25.21-25.24",
             "unused_bits": "0 "
-          }
-        },
-        "u1.i": {
-          "hide_name": 0,
-          "bits": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "signed": 1,
-          "attributes": {
-            "hdlname": "u1 i",
-            "src": "memory\\memory.sv:71.9-71.10"
           }
         },
         "u1.read_address": {
@@ -10407,14 +10398,14 @@
           "hide_name": 0,
           "bits": [ "x" ],
           "attributes": {
-            "src": "top.sv:35.27-35.40"
+            "src": "top.sv:36.27-36.40"
           }
         },
         "write_data": {
           "hide_name": 0,
           "bits": [ "x" ],
           "attributes": {
-            "src": "top.sv:36.27-36.37"
+            "src": "top.sv:37.27-37.37"
           }
         }
       }

@@ -1,72 +1,24 @@
-`timescale 1ns/1ns
+`timescale 10ns/10ns
 `include "top.sv"
 
-module RISK5_tb;
+module mp4_tb;
 
-    logic clk;
-    logic rst_n;  
-    logic _48b, _45a;
-    logic [63:0] grid_state;
-    integer frame_count;
+    logic clk = 0;
+    logic LED, RGB_R, RGB_G, RGB_B;
 
-    initial begin // this stoped my bugs
-        clk = 0;
-        frame_count = 0;
-        rst_n = 0;  
-        #10 rst_n = 1;  
-    end
 
     top u0 (
-        .clk            (clk),
-        .SW             (rst_n),  
-        ._48b           (_48b), 
-        ._45a           (_45a)
+        .clk            (clk), 
+        .LED            (LED), 
+        .RGB_R          (RGB_R), 
+        .RGB_G          (RGB_G), 
+        .RGB_B          (RGB_B)
     );
 
-    // Monitor the grid state
-    always @(posedge clk) begin
-        grid_state = u0.u1.debug_grid;
-        if (u0.newframe) begin
-            frame_count = frame_count + 1;
-            
-            // Print frame header
-            $display("\nFrame %0d:", frame_count);
-            
-            // Print debug info
-            $display("Reset: %b, Newframe: %b", rst_n, u0.newframe);
-            
-
-            $display("+--------+");
-            for (int row = 0; row < 8; row++) begin
-                logic [7:0] row_bits;
-
-                row_bits = grid_state[row*8 +: 8];
-                $write("|");
-                for (int col = 0; col < 8; col++) begin
-
-                    $write("%s", row_bits[col] ? "O" : ".");
-                end
-                $display("|");
-            end
-            $display("+--------+");
-            
-
-            $display("Grid (hex): %h", grid_state);
-            
-            $write("Live cells: ");
-            for (int i = 0; i < 64; i++) begin
-                if (grid_state[i]) begin
-                    $write("[%0d,%0d] ", i/8, i%8);
-                end
-            end
-            $display("\n");
-        end
-    end
-
     initial begin
-        $dumpfile("RISK5.vcd");
-        $dumpvars(0, RISK5_tb);
-        #800000000
+        $dumpfile("mp4.vcd");
+        $dumpvars(0, mp4_tb);
+        #100000
         $finish;
     end
 
@@ -76,4 +28,3 @@ module RISK5_tb;
     end
 
 endmodule
-
