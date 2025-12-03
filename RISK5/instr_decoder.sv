@@ -7,9 +7,9 @@ module instr_decoder (
     output logic[6:0] funct7,
     output logic fun7,
     output logic[2:0] funct3,
-    output logic[2:0] rs2,
-    output logic[2:0] rs1,
-    output logic[2:0] rd
+    output logic[4:0] rs2,
+    output logic[4:0] rs1,
+    output logic[4:0] rd
 );
     // R-type
     parameter RTYPE_CODE = 7'b0110011;
@@ -32,11 +32,13 @@ module instr_decoder (
         funct3 = 3'b010;
     end
 
+
+
     always_comb begin
-        op_code = current_instr[25:31];
+        op_code = current_instr[6:0];
         immed20 = '0;
         immed12 = '0;
-//        op_code = current_instr[6:0];
+//        op_code = current_instr[25:31];
         funct7  = '0;
         fun7    = '0;
         funct3  = '0;

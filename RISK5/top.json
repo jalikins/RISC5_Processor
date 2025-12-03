@@ -23,7 +23,7 @@
         }
       },
       "cells": {
-        "$specify$2414": {
+        "$specify$2400": {
           "hide_name": 1,
           "type": "$specify2",
           "parameters": {
@@ -9969,7 +9969,7 @@
       "attributes": {
         "hdlname": "top",
         "top": "00000000000000000000000000000001",
-        "src": "top.sv:11.1-149.10"
+        "src": "top.sv:11.1-177.10"
       },
       "ports": {
         "clk": {
@@ -10002,7 +10002,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:32.7-45.6",
+            "cell_src": "top.sv:63.7-76.6",
             "module": "$paramod$d0e7b2713155091b7908820349510d558bd1f2a3\\memory",
             "module_hdlname": "memory",
             "module_src": "memory\\memory.sv:22.1-247.10"
@@ -10020,7 +10020,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:47.21-52.6",
+            "cell_src": "top.sv:78.21-84.6",
             "module": "program_counter",
             "module_hdlname": "program_counter",
             "module_src": "program_counter.sv:1.1-20.10"
@@ -10038,7 +10038,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:54.19-63.6",
+            "cell_src": "top.sv:86.19-94.6",
             "module": "register_file",
             "module_hdlname": "register_file",
             "module_src": "register_file.sv:1.1-27.10"
@@ -10056,7 +10056,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:65.14-76.6",
+            "cell_src": "top.sv:96.14-107.6",
             "module": "ALU_unit",
             "module_hdlname": "ALU_unit",
             "module_src": "ALU_unit.sv:1.1-52.10"
@@ -10074,10 +10074,10 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:78.19-89.6",
+            "cell_src": "top.sv:109.19-121.6",
             "module": "instr_decoder",
             "module_hdlname": "instr_decoder",
-            "module_src": "instr_decoder.sv:1.1-132.10"
+            "module_src": "instr_decoder.sv:1.1-134.10"
           },
           "port_directions": {
           },
@@ -10092,7 +10092,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:91.24-97.6",
+            "cell_src": "top.sv:123.24-129.6",
             "module": "immediate_extender",
             "module_hdlname": "immediate_extender",
             "module_src": "immediate_extender.sv:1.1-16.10"
@@ -10110,7 +10110,7 @@
           },
           "attributes": {
             "cell_module_not_derived": "00000000000000000000000000000001",
-            "cell_src": "top.sv:99.16-117.6",
+            "cell_src": "top.sv:131.16-149.6",
             "module": "controller",
             "module_hdlname": "controller",
             "module_src": "controller.sv:1.1-258.10"
@@ -10157,66 +10157,12 @@
             "src": "top.sv:12.21-12.24"
           }
         },
-        "rd": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x", "0", "0", "0" ],
-          "attributes": {
-            "src": "top.sv:24.16-24.18"
-          }
-        },
-        "rs1": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x", "0", "0", "0" ],
-          "attributes": {
-            "src": "top.sv:22.16-22.19"
-          }
-        },
-        "rs2": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x", "0", "0", "0" ],
-          "attributes": {
-            "src": "top.sv:23.16-23.19"
-          }
-        },
         "u1.clk": {
           "hide_name": 0,
           "bits": [ 2 ],
           "attributes": {
             "hdlname": "u1 clk",
             "src": "memory\\memory.sv:25.21-25.24",
-            "unused_bits": "0 "
-          }
-        },
-        "u1.read_address": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u1 read_address",
-            "src": "memory\\memory.sv:30.28-30.40"
-          }
-        },
-        "u1.write_address": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u1 write_address",
-            "src": "memory\\memory.sv:28.28-28.41"
-          }
-        },
-        "u1.write_data": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u1 write_data",
-            "src": "memory\\memory.sv:29.28-29.38"
-          }
-        },
-        "u2.clk": {
-          "hide_name": 0,
-          "bits": [ 2 ],
-          "attributes": {
-            "hdlname": "u2 clk",
-            "src": "program_counter.sv:2.17-2.20",
             "unused_bits": "0 "
           }
         },
@@ -10238,46 +10184,6 @@
             "src": "register_file.sv:12.13-12.14"
           }
         },
-        "u3.rd": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x", "0", "0" ],
-          "attributes": {
-            "hdlname": "u3 rd",
-            "src": "register_file.sv:4.33-4.35"
-          }
-        },
-        "u3.result": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u3 result",
-            "src": "register_file.sv:5.24-5.30"
-          }
-        },
-        "u3.rs1": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x", "0", "0" ],
-          "attributes": {
-            "hdlname": "u3 rs1",
-            "src": "register_file.sv:4.23-4.26"
-          }
-        },
-        "u3.rs2": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x", "0", "0" ],
-          "attributes": {
-            "hdlname": "u3 rs2",
-            "src": "register_file.sv:4.28-4.31"
-          }
-        },
-        "u4.ALU_control": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u4 ALU_control",
-            "src": "ALU_unit.sv:10.22-10.33"
-          }
-        },
         "u4.clk": {
           "hide_name": 0,
           "bits": [ 2 ],
@@ -10287,46 +10193,6 @@
             "unused_bits": "0 "
           }
         },
-        "u4.current_pc": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u4 current_pc",
-            "src": "ALU_unit.sv:9.23-9.33"
-          }
-        },
-        "u4.immed_ext": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u4 immed_ext",
-            "src": "ALU_unit.sv:7.23-7.32"
-          }
-        },
-        "u4.old_pc": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u4 old_pc",
-            "src": "ALU_unit.sv:8.23-8.29"
-          }
-        },
-        "u4.rs1_data": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u4 rs1_data",
-            "src": "ALU_unit.sv:5.23-5.31"
-          }
-        },
-        "u4.rs2_data": {
-          "hide_name": 0,
-          "bits": [ "x", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
-          "attributes": {
-            "hdlname": "u4 rs2_data",
-            "src": "ALU_unit.sv:6.23-6.31"
-          }
-        },
         "u5.clk": {
           "hide_name": 0,
           "bits": [ 2 ],
@@ -10334,38 +10200,6 @@
             "hdlname": "u5 clk",
             "src": "instr_decoder.sv:3.17-3.20",
             "unused_bits": "0 "
-          }
-        },
-        "u5.rd": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x" ],
-          "attributes": {
-            "hdlname": "u5 rd",
-            "src": "instr_decoder.sv:13.23-13.25"
-          }
-        },
-        "u5.rs1": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x" ],
-          "attributes": {
-            "hdlname": "u5 rs1",
-            "src": "instr_decoder.sv:12.23-12.26"
-          }
-        },
-        "u5.rs2": {
-          "hide_name": 0,
-          "bits": [ "x", "x", "x" ],
-          "attributes": {
-            "hdlname": "u5 rs2",
-            "src": "instr_decoder.sv:11.23-11.26"
-          }
-        },
-        "u6.ImmSrc": {
-          "hide_name": 0,
-          "bits": [ "x", "0" ],
-          "attributes": {
-            "hdlname": "u6 ImmSrc",
-            "src": "immediate_extender.sv:5.22-5.28"
           }
         },
         "u6.clk": {
@@ -10392,20 +10226,6 @@
             "hdlname": "u7 clk",
             "src": "controller.sv:2.17-2.20",
             "unused_bits": "0 "
-          }
-        },
-        "write_address": {
-          "hide_name": 0,
-          "bits": [ "x" ],
-          "attributes": {
-            "src": "top.sv:36.27-36.40"
-          }
-        },
-        "write_data": {
-          "hide_name": 0,
-          "bits": [ "x" ],
-          "attributes": {
-            "src": "top.sv:37.27-37.37"
           }
         }
       }

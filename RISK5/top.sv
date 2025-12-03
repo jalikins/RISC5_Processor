@@ -19,9 +19,9 @@ module top(
     logic[6:0] op_code;
     logic[2:0] funct3;
     logic[6:0] funct7;
-    logic[5:0] rs1;
-    logic[5:0] rs2;
-    logic[5:0] rd;
+    logic[4:0] rs1;
+    logic[4:0] rs2;
+    logic[4:0] rd;
     logic[11:0] immed12;
     logic[19:0] immed20;
 
@@ -42,16 +42,16 @@ module top(
     logic[31:0] rs2_data;
 // ALU unit vars
     logic[31:0] immed_ext;
-    logic[4:0] ALU_control;
+    logic[3:0] ALU_control;
     logic[31:0] ALU_result;
     logic zero;
     logic sign;
 // ImmedExt vars
-    logic ImmSrc;
+    logic[1:0] ImmSrc;
 //controller vars
-    logic ALUSrcA;
-    logic ALUSrcB;
-    logic ResultSrc;
+    logic[1:0] ALUSrcA;
+    logic[1:0] ALUSrcB;
+    logic[1:0] ResultSrc;
     logic AdrSrc;
     logic MemWrite;
     logic IRWrite;
@@ -76,7 +76,7 @@ module top(
     );
 
     program_counter u2 (  
-        .clk            (clk), 
+//        .clk            (clk), 
         .PCWrite        (PCWrite),
         .result         (result),
         .old_pc         (old_pc),

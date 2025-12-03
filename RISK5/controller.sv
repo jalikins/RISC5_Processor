@@ -6,7 +6,7 @@ module controller (
     input logic zero, // checks if ALU out is 0
     input logic sign,
 
-    output logic[2:0] ALU_control,
+    output logic[3:0] ALU_control,
     output logic[1:0] ALUSrcA,
     output logic[1:0] ALUSrcB,
     output logic[1:0] ImmSrc,

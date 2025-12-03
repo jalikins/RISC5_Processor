@@ -5,7 +5,6 @@ module program_counter(
     output logic[31:0] current_pc
 );
 
-    logic[31:0] current_pc_temp;
     initial begin
         current_pc = 32'b0;// lowest point in instr memory
     end
