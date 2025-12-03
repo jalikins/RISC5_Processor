@@ -12,7 +12,7 @@ module controller (
     output logic[1:0] ImmSrc,
     output logic[1:0] ResultSrc,
 //    output logic decode,
-    output logic PCWrite,
+    output logic PCUpdate,
     output logic AdrSrc,
     output logic MemWrite,
     output logic IRWrite,
@@ -61,8 +61,10 @@ module controller (
     state_t state, next_state;
 
     initial begin
+        next_state = FETCH;
         AdrSrc = 1'b0;
         IRWrite = 1'b1;
+        MemWrite = 1'b0;
     end
 
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
@@ -78,6 +80,7 @@ module controller (
                 ALU_control = 4'b0000; // alu control is 0 --> add
                 PCUpdate = 1'b1;
                 ImmSrc = 2'b00; // immediate extender gets 12 bit sign extended for branching
+                ResultSrc = 2'b01;
                 // we should be updating current instr right here
             end
 
@@ -254,7 +257,6 @@ module controller (
                 ResultSrc <= 2'b00; // Writes the previous ALU out ie. old PC to reg
             end
         endcase
-        PCWrite = (branch & zero) | PCUpdate;
     end
 endmodule
 //

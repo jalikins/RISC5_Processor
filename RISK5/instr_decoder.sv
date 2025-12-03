@@ -39,7 +39,7 @@ module instr_decoder (
 //        op_code = current_instr[25:31];
         funct7  = '0;
         fun7    = '0;
-        funct3  = '0;
+//        funct3  = '0;
         rs2     = '0;
         rs1     = '0;
         rd      = '0;

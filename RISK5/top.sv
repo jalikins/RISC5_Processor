@@ -32,7 +32,7 @@ module top(
     logic[31:0] read_address;
     logic[31:0] read_data;
 //pc vars
-    logic PCWrite;
+    logic PCUpdate;
     logic[31:0] result;
     logic[31:0] old_pc;
     logic[31:0] current_pc;
@@ -76,7 +76,7 @@ module top(
 
     program_counter u2 (  
         .clk            (clk), 
-        .PCWrite        (PCWrite),
+        .PCUpdate       (PCUpdate),
         .result         (result),
         .old_pc         (old_pc),
         .current_pc     (current_pc)
@@ -140,7 +140,7 @@ module top(
         .ALUSrcB        (ALUSrcB),
         .ImmSrc         (ImmSrc),
         .ResultSrc      (ResultSrc),
-        .PCWrite        (PCWrite),
+        .PCUpdate       (PCUpdate),
         .AdrSrc         (AdrSrc),
         .MemWrite       (MemWrite),
         .IRWrite        (IRWrite),
@@ -165,7 +165,7 @@ module top(
         end
         case (ResultSrc) 
             2'b00: result <= ALU_out;
-            2'b01: result <= data;
+            2'b01: result <= read_data;
             2'b10: result <= ALU_result;
             2'b11: result <= immed_ext;
         endcase
