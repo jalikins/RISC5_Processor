@@ -1,5 +1,4 @@
 `include "memory\memory.sv" 
-//`include "memory\rv32i_test.txt"
 `include "program_counter.sv" 
 `include "register_file.sv" 
 `include "ALU_unit.sv"
@@ -76,7 +75,7 @@ module top(
     );
 
     program_counter u2 (  
-//        .clk            (clk), 
+        .clk            (clk), 
         .PCWrite        (PCWrite),
         .result         (result),
         .old_pc         (old_pc),

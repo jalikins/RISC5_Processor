@@ -32,8 +32,6 @@ module instr_decoder (
         funct3 = 3'b010;
     end
 
-
-
     always_comb begin
         op_code = current_instr[6:0];
         immed20 = '0;

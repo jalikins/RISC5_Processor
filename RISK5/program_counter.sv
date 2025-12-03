@@ -1,4 +1,5 @@
 module program_counter(
+    input logic clk,
     input logic PCWrite,
     input logic[31:0] result,
     input logic[31:0] old_pc,
@@ -9,7 +10,7 @@ module program_counter(
         current_pc = 32'b0;// lowest point in instr memory
     end
     
-    always_comb begin
+    always_ff@(posedge clk) begin
         if (PCWrite) begin
             current_pc = result;
         end else begin

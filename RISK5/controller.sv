@@ -61,7 +61,8 @@ module controller (
     state_t state, next_state;
 
     initial begin
-        AdrSrc = 0;
+        AdrSrc = 1'b0;
+        IRWrite = 1'b1;
     end
 
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
