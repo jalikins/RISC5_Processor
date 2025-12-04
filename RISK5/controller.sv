@@ -87,6 +87,7 @@ module controller (
             DECODE: begin
                 //update the current instruction
                 // always calculate the branch target as though the instruction were a branch
+                IRWrite <= 1'b0;
                 ALUSrcA = 2'b01; // Should be OldPC
                 ALUSrcB = 2'b01; // immedext
                 ALU_control = 4'b0000; // Addition
