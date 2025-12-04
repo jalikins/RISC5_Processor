@@ -58,22 +58,16 @@ module controller (
 
     initial begin
         state = FETCH;
-        next_state = FETCH;
         AdrSrc = 1'b0;
         IRWrite = 1'b0;
         MemWrite = 1'b0;
-    end
-    always_ff@(posedge clk) begin
-        if (op_code) begin
-            state <= next_state;
-        end
     end
 
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
         case (state)
             FETCH: begin
                 ResultSrc <= 2'b10;
-                next_state = DECODE; // write pc to old_pc
+                next_state <= DECODE; // write pc to old_pc
                 AdrSrc <= 1'b0; // fetch adress from pc
                 IRWrite <= 1'b1; // writes to instruction reg
                 ALUSrcA <= 2'b00; // updating the pc --> choose pc as src 1 for alu
@@ -247,9 +241,10 @@ module controller (
 
             LUI: begin
                 next_state = ALUWB;
+                ImmSrc <= 2'b01;
                 RegWrite <= 1'b1;
                 ResultSrc <= 2'b11; // Should be immediate generator
-                ALU_control <= 4'b1111;
+                ALU_control <= 4'b1111; //  ALU does nothing
             end
 
             AUIPC: begin
@@ -260,8 +255,10 @@ module controller (
                 ResultSrc <= 2'b00; // Writes the previous ALU out ie. old PC to reg
             end
         endcase
-
-
+        if (op_code == 7'bxxxxxxx) begin
+            next_state <= FETCH;
+        end
+        state <= next_state; // make sure op_code is defined
     end
 endmodule
 //
