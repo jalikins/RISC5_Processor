@@ -91,6 +91,7 @@ module controller (
                 ALUSrcA = 2'b01; // Should be OldPC
                 ALUSrcB = 2'b01; // immedext
                 ALU_control = 4'b0000; // Addition
+                PCUpdate = 1'b0;
                 case (op_code)
                     LOAD_CODE: begin
                         next_state = MEMADR; // if we are in a lb/lh/lw instr we go to MEM_ADR
