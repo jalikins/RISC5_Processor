@@ -7,11 +7,13 @@ module program_counter(
 );
 
     initial begin
-        current_pc = 32'b0;// lowest point in instr memory
+        current_pc = 32'b0; // lowest point in instr memory
+        old_pc = current_pc;
     end
     
     always_ff@(posedge clk) begin
         if (PCUpdate) begin
+            old_pc = current_pc;
             current_pc = result;
         end 
     end
