@@ -10,9 +10,11 @@ module program_counter(
         current_pc = 32'b0; // lowest point in instr memory
     end
     
-    always_ff@(posedge PCUpdate) begin
-        old_pc = current_pc;
-        current_pc = result;
+    always @(result) begin
+        if (PCUpdate) begin
+            old_pc = current_pc;
+            current_pc = result;
+        end
     end
 
 endmodule

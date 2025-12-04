@@ -63,14 +63,16 @@ module controller (
         IRWrite = 1'b0;
         MemWrite = 1'b0;
     end
-
-    always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
+    always_ff@(posedge clk) begin
         if (op_code) begin
             state <= next_state;
         end
-        case (state)
+    end
 
+    always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
+        case (state)
             FETCH: begin
+                ResultSrc <= 2'b10;
                 next_state = DECODE; // write pc to old_pc
                 AdrSrc <= 1'b0; // fetch adress from pc
                 IRWrite <= 1'b1; // writes to instruction reg
@@ -79,7 +81,6 @@ module controller (
                 ALU_control <= 4'b0000; // alu control is 0 --> add
                 PCUpdate <= 1'b1;
                 ImmSrc <= 2'b00; // immediate extender gets 12 bit sign extended for branching
-                ResultSrc <= 2'b10;
                 // we should be updating current instr right here
             end
 
@@ -87,10 +88,10 @@ module controller (
                 //update the current instruction
                 // always calculate the branch target as though the instruction were a branch
                 IRWrite <= 1'b0;
-                ALUSrcA = 2'b01; // Should be OldPC
-                ALUSrcB = 2'b01; // immedext
-                ALU_control = 4'b0000; // Addition
-                PCUpdate = 1'b0;
+                ALUSrcA <= 2'b01; // Should be OldPC
+                ALUSrcB <= 2'b01; // immedext
+                ALU_control <= 4'b0000; // Addition
+                PCUpdate <= 1'b0;
                 case (op_code)
                     LOAD_CODE: begin
                         next_state = MEMADR; // if we are in a lb/lh/lw instr we go to MEM_ADR

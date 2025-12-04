@@ -1,4 +1,4 @@
-`include "memory/memory.sv" 
+`include "memory\memory.sv" 
 `include "program_counter.sv" 
 `include "register_file.sv" 
 `include "ALU_unit.sv"
@@ -112,7 +112,7 @@ module top(
     );
 
     instr_decoder u5 (
-        .clk            (clk), 
+//        .clk            (clk), 
         .current_instr  (current_instr),
         .immed20        (immed20),
         .immed12        (immed12),

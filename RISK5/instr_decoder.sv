@@ -1,6 +1,6 @@
 module instr_decoder (
     input logic[31:0] current_instr,
-    input logic clk,
+//    input logic clk,
     output logic[19:0] immed20,
     output logic[11:0] immed12,
     output logic[6:0] op_code,
