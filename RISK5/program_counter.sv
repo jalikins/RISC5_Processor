@@ -13,9 +13,7 @@ module program_counter(
     always_ff@(posedge clk) begin
         if (PCUpdate) begin
             current_pc = result;
-        end else begin
-            current_pc = old_pc;
-        end
+        end 
     end
 
 endmodule

@@ -60,7 +60,7 @@ module controller (
         state = FETCH;
         next_state = FETCH;
         AdrSrc = 1'b0;
-        IRWrite = 1'b1;
+        IRWrite = 1'b0;
         MemWrite = 1'b0;
     end
 
@@ -72,12 +72,12 @@ module controller (
                 next_state = DECODE; // write pc to old_pc
                 AdrSrc <= 1'b0; // fetch adress from pc
                 IRWrite <= 1'b1; // writes to instruction reg
-                ALUSrcA = 2'b00; // updating the pc --> choose pc as src 1 for alu
-                ALUSrcB = 2'b10; // alu src b is the constant 4
-                ALU_control = 4'b0000; // alu control is 0 --> add
-                PCUpdate = 1'b1;
-                ImmSrc = 2'b00; // immediate extender gets 12 bit sign extended for branching
-                ResultSrc = 2'b10;
+                ALUSrcA <= 2'b00; // updating the pc --> choose pc as src 1 for alu
+                ALUSrcB <= 2'b10; // alu src b is the constant 4
+                ALU_control <= 4'b0000; // alu control is 0 --> add
+                PCUpdate <= 1'b1;
+                ImmSrc <= 2'b00; // immediate extender gets 12 bit sign extended for branching
+                ResultSrc <= 2'b10;
                 // we should be updating current instr right here
             end
 
