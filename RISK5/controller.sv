@@ -64,11 +64,10 @@ module controller (
         MemWrite = 1'b0;
     end
 
-    always_ff @(posedge clk) begin
-        state <= next_state;
-    end
-
-    always_comb begin // not sure if should be alwayscomb or posedge
+    always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
+        if (op_code) begin
+            state <= next_state;
+        end
         case (state)
 
             FETCH: begin
