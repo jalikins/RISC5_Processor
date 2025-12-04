@@ -1,4 +1,4 @@
-`include "memory\memory.sv" 
+`include "memory/memory.sv" 
 `include "program_counter.sv" 
 `include "register_file.sv" 
 `include "ALU_unit.sv"
@@ -55,6 +55,10 @@ module top(
     logic MemWrite;
     logic IRWrite;
     logic RegWrite;
+
+    initial begin
+        result = 32'b0; // lowest point in instr memory
+    end
 
 
     memory #(
