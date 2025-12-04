@@ -16,7 +16,7 @@ module ALU_unit(
     logic [31:0] A;
     logic [31:0] B;
 
-    always_ff@(posedge clk) begin
+    always_comb begin
         case (ALUSrcA)
             2'b00: A = current_pc;
             2'b01: A = old_pc;

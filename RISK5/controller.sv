@@ -64,8 +64,11 @@ module controller (
         MemWrite = 1'b0;
     end
 
-    always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
+    always_ff @(posedge clk) begin
         state <= next_state;
+    end
+
+    always_comb begin // not sure if should be alwayscomb or posedge
         case (state)
 
             FETCH: begin
@@ -115,6 +118,7 @@ module controller (
                     AUIPC_CODE: begin
                         next_state = AUIPC;
                     end
+                    default: next_state = FETCH;
                 endcase
             end 
 
@@ -254,6 +258,8 @@ module controller (
                 ResultSrc <= 2'b00; // Writes the previous ALU out ie. old PC to reg
             end
         endcase
+
+
     end
 endmodule
 //

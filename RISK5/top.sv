@@ -93,7 +93,9 @@ module top(
     );
 
     ALU_unit u4 (
-        .clk            (clk), 
+        .clk            (clk),
+        .ALUSrcA        (ALUSrcA),
+        .ALUSrcB        (ALUSrcB), 
         .rs1_data       (rs1_data),
         .rs2_data       (rs2_data),
         .immed_ext      (immed_ext),
