@@ -16,19 +16,35 @@ module ALU_unit(
     logic [31:0] A;
     logic [31:0] B;
 
-    always_comb begin
+    always @(ALUSrcA) begin
         case (ALUSrcA)
             2'b00: A = current_pc;
             2'b01: A = old_pc;
             2'b10: A = rs1_data;
         endcase
+    end
+
+    always @(ALUSrcA) begin
         case (ALUSrcB)
             2'b00: B = rs2_data;
             2'b01: B = immed_ext;
             2'b10: B = 4;
         endcase
+    end
+
+    always_comb begin
+//        case (ALUSrcA)
+//            2'b00: A = current_pc;
+//            2'b01: A = old_pc;
+//            2'b10: A = rs1_data;
+//        endcase
+//        case (ALUSrcB)
+//            2'b00: B = rs2_data;
+//            2'b01: B = immed_ext;
+//            2'b10: B = 4;
+//        endcase
         case (ALU_control)
-            4'b0000: ALU_result = $signed(A + B); // ADD (signed)
+            4'b0000: ALU_result = A + B; // ADD (signed)
             4'b0110: ALU_result = $signed(A - B); // SUBTRACT
             4'b0010: ALU_result = A | B; // OR
             4'b0001: ALU_result = A & B; // AND

@@ -122,6 +122,7 @@ module controller (
                 ALUSrcA <= 2'b10; // Set ALU signals rs1 and immed12
                 ALUSrcB <= 2'b01;
                 ALU_control <= 4'b0000; // ALU set to add mode
+                PCUpdate <= 1'b0;
                 case (op_code)
                     LOAD_CODE: begin
                         next_state = MEMREAD; // if we are in a lb/lh/lw instr we go to MEMREAD
@@ -136,6 +137,7 @@ module controller (
                 next_state = MEMWB; // if we are in a lb/lh/lw instr we go to MEM_ADR
                 ResultSrc <= 2'b00; // routes ALUout through result mux
                 AdrSrc <= 1'b0; // routes ALUout through data adress
+                PCUpdate <= 1'b0;
                 ALU_control <= 4'b1111;
                 // data is read from ALUout adress
                 // data is stored in data register
@@ -145,6 +147,7 @@ module controller (
                 next_state = FETCH;
                 ResultSrc <= 2'b01; // Selects the data as the result
                 RegWrite <= 1'b1; // Writing data to the register file
+                PCUpdate <= 1'b0;
                 ALU_control <= 4'b1111;
             end
 
@@ -153,6 +156,7 @@ module controller (
                 ResultSrc <= 2'b00;
                 AdrSrc <= 1'b1;
                 MemWrite <= 1'b1;
+                PCUpdate <= 1'b0;
                 ALU_control <= 4'b1111;
             end
 
@@ -160,6 +164,7 @@ module controller (
                 next_state = ALUWB;
                 ALUSrcA <= 2'b10; // rs1
                 ALUSrcB <= 2'b00; // rs2
+                PCUpdate <= 1'b0;
                 case({fun7, funct3})
                     {1'b0, 3'b000}: ALU_control = 4'b0000; // ADD !!! In textbook add is 000
                     {1'b1, 3'b000}: ALU_control = 4'b0110; // SUB
@@ -179,6 +184,7 @@ module controller (
                 next_state = FETCH;
                 ResultSrc <= 2'b00; // result from ALU
                 RegWrite <= 1'b1; //writes to rd
+                PCUpdate <= 1'b0;
                 ALU_control <= 4'b1111;
             end
 
@@ -208,6 +214,7 @@ module controller (
                 next_state = ALUWB;
                 ALUSrcA <= 2'b10;
                 ALUSrcB <= 2'b01;
+                PCUpdate <= 1'b0;
                 case({fun7, funct3})
                     {1'b0, 3'b000}: ALU_control <= 4'b0000; // ADD !!! In textbook add is 000
                     {1'b0, 3'b111}: ALU_control <= 4'b0001; // AND
@@ -244,6 +251,7 @@ module controller (
                 ImmSrc <= 2'b01;
                 RegWrite <= 1'b1;
                 ResultSrc <= 2'b11; // Should be immediate generator
+                PCUpdate <= 1'b0;
                 ALU_control <= 4'b1111; //  ALU does nothing
             end
 
@@ -253,6 +261,7 @@ module controller (
                 ALUSrcA <= 2'b01; // Old PC
                 ALUSrcB <= 2'b01; // Imm gen
                 ResultSrc <= 2'b00; // Writes the previous ALU out ie. old PC to reg
+                PCUpdate <= 1'b1;
             end
         endcase
         if (op_code == 7'bxxxxxxx) begin
