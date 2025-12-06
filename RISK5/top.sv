@@ -88,6 +88,7 @@ module top(
 
     register_file u3 (
         .clk            (clk), 
+        .RegWrite       (RegWrite),
         .rs1            (rs1),
         .rs2            (rs2),
         .rd             (rd),
