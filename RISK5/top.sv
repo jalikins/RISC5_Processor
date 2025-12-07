@@ -153,30 +153,74 @@ module top(
         .RegWrite       (RegWrite)
     );
 
-    always_ff @(posedge clk) begin
-        if (MemWrite == 1'b0) begin
-            case (AdrSrc) 
-                1'b0: read_address = current_pc;
-                1'b1: read_address = result;
-            endcase
-        end else if (MemWrite == 1'b1) begin
-            case (AdrSrc) 
-                1'b0: write_address = current_pc;
-                1'b1: write_address = result;
-            endcase
-            write_data = rs2_data;
+    // always_ff @(posedge clk) begin
+    //     if (MemWrite == 1'b0) begin
+    //         case (AdrSrc) 
+    //             1'b0: read_address = current_pc;
+    //             1'b1: read_address = result;
+    //         endcase
+    //     end else if (MemWrite == 1'b1) begin
+    //         case (AdrSrc) 
+    //             1'b0: write_address = current_pc;
+    //             1'b1: write_address = result;
+    //         endcase
+    //         write_data = rs2_data;
+    //     end
+    //     if (IRWrite) begin
+    //         current_instr = read_data; // Current instruction is the data we read form instr mem
+    //     end
+    //     case (ResultSrc) 
+    //         2'b00: result <= ALU_out;
+    //         2'b01: result <= read_data;
+    //         2'b10: result <= ALU_result;
+    //         2'b11: result <= immed_ext;
+    //     endcase
+    //     ALU_out <= ALU_result;
+    //     data <= read_data;
+    // end
+
+
+// Jacob's version of the always block
+
+// always_ff @(posedge clk) begin
+//     if (IRWrite) begin
+//         current_instr <= read_data;
+//     end
+//     ALU_out <= ALU_result; // ALU Output 
+//     data <= read_data;     
+// end
+
+always_comb begin
+    read_address = current_pc;
+    write_address = result;
+    write_data = rs2_data;
+    result = ALU_out;
+    
+    if (IRWrite) begin
+            current_instr <= read_data;
         end
-        if (IRWrite) begin
-            current_instr = read_data; // Current instruction is the data we read form instr mem
-        end
-        case (ResultSrc) 
-            2'b00: result <= ALU_out;
-            2'b01: result <= read_data;
-            2'b10: result <= ALU_result;
-            2'b11: result <= immed_ext;
+
+    ALU_out <= ALU_result; // ALU Output 
+    data <= read_data;     
+
+    if (MemWrite == 1'b0) begin
+        case (AdrSrc) 
+            1'b0: read_address = current_pc;
+            1'b1: read_address = result;
         endcase
-        ALU_out <= ALU_result;
-        data <= read_data;
+    end else begin 
+        case (AdrSrc) 
+            1'b0: write_address = current_pc;
+            1'b1: write_address = result;
+        endcase
     end
+    
+    case (ResultSrc) 
+        2'b00: result = ALU_out;
+        2'b01: result = read_data; 
+        2'b10: result = ALU_result;
+        2'b11: result = immed_ext;
+    endcase
+end
 
 endmodule
