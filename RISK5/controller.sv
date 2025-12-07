@@ -63,7 +63,12 @@ module controller (
         MemWrite = 1'b0;
     end
 
+
     always_ff@(posedge clk) begin // not sure if should be alwayscomb or posedge
+        state <= next_state; // make sure op_code is defined
+    end
+
+    always_comb begin// not sure if should be alwayscomb or posedge
         case (state)
             FETCH: begin
                 ResultSrc <= 2'b10;
@@ -267,7 +272,6 @@ module controller (
         if (op_code == 7'bxxxxxxx) begin
             next_state <= FETCH;
         end
-        state <= next_state; // make sure op_code is defined
     end
 endmodule
 //

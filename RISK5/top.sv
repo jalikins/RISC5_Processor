@@ -1,4 +1,4 @@
-`include "memory\memory.sv" 
+`include "memory/memory.sv" 
 `include "program_counter.sv" 
 `include "register_file.sv" 
 `include "ALU_unit.sv"
