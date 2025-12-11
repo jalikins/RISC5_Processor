@@ -178,6 +178,8 @@ module top(
         endcase
         ALU_out <= ALU_result;
         data <= read_data;
+        LED <= result[31];
+        #2;
     end
 
 endmodule

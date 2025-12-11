@@ -55,6 +55,7 @@ module ALU_unit(
             4'b1010: ALU_result = ($signed(A) < $signed(B)) ? 32'b1 : 32'b0; // SLT signed
             4'b1100: ALU_result = ~(A | B); // NOR
             4'b1101: ALU_result = A - B; // Subtract unsigned
+            default: ALU_result = 32'b0;
         endcase
         zero = (ALU_result == 32'b0) ? 1'b1 : 1'b0;
         if (ALU_result[0] == 1'b0) begin
